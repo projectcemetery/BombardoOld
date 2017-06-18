@@ -83,5 +83,8 @@ class Player extends Entity {
             b.xMax += speed * dt;
             if (!level.isCollideSide (b, CollideSide.Right)) move (speed * dt, 0);
         }
+        if (hxd.Key.isDown (hxd.Key.SPACE)) {
+
+        }
     }
 }

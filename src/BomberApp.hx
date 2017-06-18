@@ -48,7 +48,16 @@ class BomberApp extends hxd.App {
         s3d.camera.pos.set (4.0, 8.0, 20);
         s3d.camera.target.set (4.0, 3, 0);       
        
-       //new h3d.scene.CameraController (s3d).loadFromCamera ();
+        //new h3d.scene.CameraController (s3d).loadFromCamera ();
+
+       // Test bomb
+
+       var cache = new h3d.prim.ModelCache();
+       var obj = cache.loadModel(hxd.Res.bomb);
+       obj.setPos (1.5,1.5,0.3);
+       obj.rotate (0.3, 0.0, 0.0);
+       s3d.addChild (obj);
+       obj.scale (0.003);
 	}
 
 	override function update( dt : Float ) {
