@@ -2,6 +2,7 @@ package map;
 
 import h3d.scene.Mesh;
 import col.CollideSide;
+import ent.Entity;
 
 /**
  *  Game level
@@ -37,6 +38,11 @@ class Level {
      *  Map for walls
      */
     var wallMap : Map<Int, Mesh> = new Map<Int, Mesh> ();
+
+    /**
+     *  Static entities that does not move from cell
+     */
+    var cellEntities : Map<Int, Entity> = new Map<Int, Entity> ();
 
     /**
      *  Get mesh wall
@@ -122,6 +128,52 @@ class Level {
         floorMat.shadows = true;
 
         createLevel ();
+    }
+
+    /**
+     *  Return map pos for entity position
+     *  @param x - 
+     *  @param y - 
+     */
+    public function getMapPos (x : Float, y : Float) : { x : Int, y : Int } {
+        return {
+            x : Math.floor (x),
+            y : Math.floor (y)
+        }
+    }
+
+    /**
+     *  Place entity to map
+     *  @param x - 
+     *  @param y - 
+     *  @param entity - 
+     */
+    public function placeCellEntity (x : Float, y : Float, entity : Entity) : Void {
+        var mapPos = getMapPos (x, y);
+        var pos = mapPos.y * mapWidth + mapPos.x;
+        cellEntities[pos] = entity;
+        s3d.addChild (entity.model);
+        entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
+    }
+
+    /**
+     *  Return entity from map, by map cell position
+     *  return null if not exists
+     *  @param x - 
+     *  @param y - 
+     *  @return Entity
+     */
+    public function getCellEntity (x : Int, y : Int) : Entity {
+        var pos = y * mapWidth + x;
+        return cellEntities[pos];
+    }
+
+    /**
+     *  Remove entity from map
+     *  @param entity - 
+     */
+    public function removeCellEntity (entity : Entity) {
+
     }
 
     /**

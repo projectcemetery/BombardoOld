@@ -2,6 +2,8 @@ package ent;
 
 import map.Level;
 import col.CollideSide;
+import ent.Bomb;
+import ent.EntityFactory;
 
 /**
  *  Player
@@ -17,6 +19,8 @@ class Player extends Entity {
      *  Current game level
      */
     var level : Level;
+
+    var entityFactory : EntityFactory;
 
     /**
      *  Player mesh
@@ -48,12 +52,14 @@ class Player extends Entity {
     public function new  () {
         s3d = BomberApp.get ().s3d;
         level = BomberApp.get ().level;
+        entityFactory = BomberApp.get ().entityFactory;
 
         var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
         //cube.translate (-0.25,-0.25,-0.25);
         mesh = new h3d.scene.Mesh (cube, s3d);
         mesh.material.color.setColor (0xFF3300);
         mesh.setPos (4.25, 3, 0.0);
+        model = mesh;
     }    
 
     /**
@@ -83,8 +89,10 @@ class Player extends Entity {
             b.xMax += speed * dt;
             if (!level.isCollideSide (b, CollideSide.Right)) move (speed * dt, 0);
         }
-        if (hxd.Key.isDown (hxd.Key.SPACE)) {
-
+        if (hxd.Key.isPressed (hxd.Key.SPACE)) {
+            // Place bomb
+            var bomb = entityFactory.recycleBomb ();
+            level.placeCellEntity (mesh.x, mesh.y, bomb);
         }
     }
 }
