@@ -8,19 +8,7 @@ import ent.EntityFactory;
 /**
  *  Player
  */
-class Player extends Entity {
-
-    /**
-     *  Main 3d scene
-     */
-    var s3d : h3d.scene.Scene;
-
-    /**
-     *  Current game level
-     */
-    var level : Level;
-
-    var entityFactory : EntityFactory;
+class Player extends MovingEntity {
 
     /**
      *  Player mesh
@@ -33,10 +21,15 @@ class Player extends Entity {
     var speed : Float = 0.03;
 
     /**
+     *  Is entity disposed
+     */
+    var isDisposed : Bool = false;
+
+    /**
      *  Move
      *  @param x - 
      */
-    function move (x : Float, y : Float) {
+    function move (x : Float, y : Float) : Void {
         mesh.x += x;
         s3d.camera.pos.x += x;
         s3d.camera.target.x += x;
@@ -44,29 +37,25 @@ class Player extends Entity {
         mesh.y += y;
         s3d.camera.pos.y += y;
         s3d.camera.target.y += y;
-    }
+    }    
 
     /**
-     *  Constructor
+     *  Place bomb
      */
-    public function new  () {
-        s3d = BomberApp.get ().s3d;
-        level = BomberApp.get ().level;
-        entityFactory = BomberApp.get ().entityFactory;
-
-        var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
-        //cube.translate (-0.25,-0.25,-0.25);
-        mesh = new h3d.scene.Mesh (cube, s3d);
-        mesh.material.color.setColor (0xFF3300);
-        mesh.setPos (4.25, 3, 0.0);
-        model = mesh;
-    }    
+    function placeBomb () : Void {
+        // Place bomb
+        var bomb = entityFactory.recycleBomb ();
+        level.placeEntity (mesh.x, mesh.y, bomb);
+        bomb.startTimer ();
+    }
 
     /**
      *  On player logic update
      *  @param dt - 
      */
-    override public function onUpdate (dt : Float) : Void {
+    function onUpdate (dt : Float) : Bool {
+        if (isDisposed) return true;
+
         var bounds = mesh.getBounds ();
 
         if (hxd.Key.isDown (hxd.Key.W)) {
@@ -90,9 +79,40 @@ class Player extends Entity {
             if (!level.isCollideSide (b, CollideSide.Right)) move (speed * dt, 0);
         }
         if (hxd.Key.isPressed (hxd.Key.SPACE)) {
-            // Place bomb
-            var bomb = entityFactory.recycleBomb ();
-            level.placeCellEntity (mesh.x, mesh.y, bomb);
+            placeBomb ();
         }
+
+        return false;
+    }
+
+    /**
+     *  Constructor
+     */
+    public function new  () {
+        super ();
+
+        var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
+        cube.translate (-0.25,-0.25,-0.25);
+        mesh = new h3d.scene.Mesh (cube);
+        mesh.material.color.setColor (0xFF3300);
+        model = mesh;
+
+        level.placeEntity (4, 3, this);
+
+        waitEvent.waitUntil (onUpdate);
+    }
+
+    /**
+     *  On entity hit, by bombs or something else
+     */
+    override public function onHit () : Void {
+        level.removeEntity (this);
+    }
+
+    /**
+     *  Dispose entity
+     */
+    override public function onDispose () : Void {
+        isDisposed = true;
     }
 }

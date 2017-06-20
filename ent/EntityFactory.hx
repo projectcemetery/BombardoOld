@@ -6,6 +6,16 @@ package ent;
 class EntityFactory {
 
     /**
+     *  Settings for bomb
+     */
+    public var bombSettings : BombSettings;
+
+    /**
+     *  Explosion settings
+     */
+    public var explosionSettings : ExplosionSettings;
+
+    /**
      *  Bombs for recycle;
      */
     var bomb : Bomb;
@@ -13,8 +23,24 @@ class EntityFactory {
     /**
      *  Constructor
      */
-    public function new () {
-        bomb = new Bomb ();
+    public function new () {}
+
+    /**
+     *  Init after create
+     */
+    public function init () {
+        // TODO load from file default settings
+
+        bombSettings = {
+            lifetime : 2.0,
+            length : 2
+        }
+
+        explosionSettings = {
+            lifetime : 1.0
+        }
+
+        bomb = new Bomb (bombSettings);
     }
 
     /**
@@ -26,5 +52,14 @@ class EntityFactory {
     public function recycleBomb () : Bomb {
         // TODO recycle
         return bomb;
+    }
+
+    /**
+     *  Get explosion
+     *  @return Explosion
+     */
+    public function recycleExplosion () : Explosion {
+        // TODO recycle
+        return new Explosion (explosionSettings);
     }
 }

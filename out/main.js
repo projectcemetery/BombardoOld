@@ -152,9 +152,12 @@ BomberApp.__super__ = hxd_App;
 BomberApp.prototype = $extend(hxd_App.prototype,{
 	init: function() {
 		BomberApp.instance = this;
+		this.waitEvent = new hxd_WaitEvent();
 		this.modelCache = new h3d_prim_ModelCache();
-		this.entityFactory = new ent_EntityFactory();
 		this.level = new map_Level();
+		this.entityFactory = new ent_EntityFactory();
+		this.level.init();
+		this.entityFactory.init();
 		this.player = new ent_Player();
 		var dir = new h3d_scene_DirLight(new h3d_Vector(0.2,0.3,-1),this.s3d);
 		var _this = dir.get_color();
@@ -176,7 +179,7 @@ BomberApp.prototype = $extend(hxd_App.prototype,{
 		_this2.w = 1.;
 	}
 	,update: function(dt) {
-		this.player.onUpdate(dt);
+		this.waitEvent.update(dt);
 	}
 	,__class__: BomberApp
 });
@@ -761,13 +764,19 @@ col_CollideSide.Left = ["Left",3];
 col_CollideSide.Left.toString = $estr;
 col_CollideSide.Left.__enum__ = col_CollideSide;
 col_CollideSide.__empty_constructs__ = [col_CollideSide.Top,col_CollideSide.Right,col_CollideSide.Bottom,col_CollideSide.Left];
-var ent_Entity = function() { };
+var ent_Entity = function() {
+	this.waitEvent = BomberApp.instance.waitEvent;
+	this.s3d = BomberApp.instance.s3d;
+	this.modelCache = BomberApp.instance.modelCache;
+	this.level = BomberApp.instance.level;
+	this.entityFactory = BomberApp.instance.entityFactory;
+};
 $hxClasses["ent.Entity"] = ent_Entity;
 ent_Entity.__name__ = ["ent","Entity"];
 ent_Entity.prototype = {
 	reset: function() {
 	}
-	,getPos: function(x,y) {
+	,getPos: function() {
 		return new h3d_col_Point(this.model.x,this.model.y,this.model.z);
 	}
 	,setPos: function(x,y) {
@@ -790,13 +799,25 @@ ent_Entity.prototype = {
 			_this1.flags &= ~f1;
 		}
 	}
-	,onUpdate: function(dt) {
+	,onDispose: function() {
+	}
+	,onHit: function() {
 	}
 	,__class__: ent_Entity
 };
-var ent_Bomb = function() {
-	var cache = BomberApp.instance.modelCache;
-	this.model = cache.loadModel(hxd_Res.get_loader().loadModel("bomb.fbx"));
+var ent_StaticEntity = function() {
+	ent_Entity.call(this);
+};
+$hxClasses["ent.StaticEntity"] = ent_StaticEntity;
+ent_StaticEntity.__name__ = ["ent","StaticEntity"];
+ent_StaticEntity.__super__ = ent_Entity;
+ent_StaticEntity.prototype = $extend(ent_Entity.prototype,{
+	__class__: ent_StaticEntity
+});
+var ent_Bomb = function(bombSettings) {
+	ent_StaticEntity.call(this);
+	this.bombSettings = bombSettings;
+	this.model = this.modelCache.loadModel(hxd_Res.get_loader().loadModel("bomb.fbx"));
 	this.model.rotate(0.3,0.0,0.0);
 	var _this = this.model;
 	var _g = _this;
@@ -839,71 +860,174 @@ var ent_Bomb = function() {
 };
 $hxClasses["ent.Bomb"] = ent_Bomb;
 ent_Bomb.__name__ = ["ent","Bomb"];
-ent_Bomb.__super__ = ent_Entity;
-ent_Bomb.prototype = $extend(ent_Entity.prototype,{
-	__class__: ent_Bomb
+ent_Bomb.__super__ = ent_StaticEntity;
+ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
+	startTimer: function() {
+		var _gthis = this;
+		this.waitEvent.wait(this.bombSettings.lifetime,function() {
+			var wallLeft = false;
+			var wallRight = false;
+			var wallTop = false;
+			var wallBottom = false;
+			var pos = _gthis.getPos();
+			var mapPos = _gthis.level.getMapPos(pos.x,pos.y);
+			var px = mapPos.x;
+			var py = mapPos.y;
+			if(!_gthis.level.isWall(px,py)) {
+				var entity = _gthis.level.getEntity(px,py);
+				if(entity != null) {
+					entity.onHit();
+				}
+				var expl = _gthis.entityFactory.recycleExplosion();
+				_gthis.level.placeEntity(px,py,expl);
+				expl.startTimer();
+			}
+			var _g1 = 0;
+			var _g = _gthis.bombSettings.length - 1;
+			while(_g1 < _g) {
+				var i = _g1++;
+				var x = mapPos.x + (i + 1);
+				var y = mapPos.y;
+				if(!wallRight) {
+					if(_gthis.level.isWall(x,y)) {
+						wallRight = true;
+					} else {
+						var entity1 = _gthis.level.getEntity(x,y);
+						if(entity1 != null) {
+							entity1.onHit();
+						}
+						var expl1 = _gthis.entityFactory.recycleExplosion();
+						_gthis.level.placeEntity(x,y,expl1);
+						expl1.startTimer();
+						wallRight = false;
+					}
+				}
+				x = mapPos.x - (i + 1);
+				y = mapPos.y;
+				if(!wallLeft) {
+					if(_gthis.level.isWall(x,y)) {
+						wallLeft = true;
+					} else {
+						var entity2 = _gthis.level.getEntity(x,y);
+						if(entity2 != null) {
+							entity2.onHit();
+						}
+						var expl2 = _gthis.entityFactory.recycleExplosion();
+						_gthis.level.placeEntity(x,y,expl2);
+						expl2.startTimer();
+						wallLeft = false;
+					}
+				}
+				x = mapPos.x;
+				y = mapPos.y + (i + 1);
+				if(!wallBottom) {
+					if(_gthis.level.isWall(x,y)) {
+						wallBottom = true;
+					} else {
+						var entity3 = _gthis.level.getEntity(x,y);
+						if(entity3 != null) {
+							entity3.onHit();
+						}
+						var expl3 = _gthis.entityFactory.recycleExplosion();
+						_gthis.level.placeEntity(x,y,expl3);
+						expl3.startTimer();
+						wallBottom = false;
+					}
+				}
+				x = mapPos.x;
+				y = mapPos.y - (i + 1);
+				if(!wallTop) {
+					if(_gthis.level.isWall(x,y)) {
+						wallTop = true;
+					} else {
+						var entity4 = _gthis.level.getEntity(x,y);
+						if(entity4 != null) {
+							entity4.onHit();
+						}
+						var expl4 = _gthis.entityFactory.recycleExplosion();
+						_gthis.level.placeEntity(x,y,expl4);
+						expl4.startTimer();
+						wallTop = false;
+					}
+				}
+			}
+			_gthis.level.removeEntity(_gthis);
+		});
+	}
+	,__class__: ent_Bomb
 });
 var ent_EntityFactory = function() {
-	this.bomb = new ent_Bomb();
 };
 $hxClasses["ent.EntityFactory"] = ent_EntityFactory;
 ent_EntityFactory.__name__ = ["ent","EntityFactory"];
 ent_EntityFactory.prototype = {
-	recycleBomb: function() {
+	init: function() {
+		this.bombSettings = { lifetime : 2.0, length : 2};
+		this.explosionSettings = { lifetime : 1.0};
+		this.bomb = new ent_Bomb(this.bombSettings);
+	}
+	,recycleBomb: function() {
 		return this.bomb;
+	}
+	,recycleExplosion: function() {
+		return new ent_Explosion(this.explosionSettings);
 	}
 	,__class__: ent_EntityFactory
 };
-var ent_Player = function() {
-	this.speed = 0.03;
-	this.s3d = BomberApp.instance.s3d;
-	this.level = BomberApp.instance.level;
-	this.entityFactory = BomberApp.instance.entityFactory;
+var ent_Explosion = function(explosionSettings) {
+	ent_StaticEntity.call(this);
+	this.explosionSettings = explosionSettings;
 	var cube = new h3d_prim_Cube(0.5,0.5,0.5);
-	this.mesh = new h3d_scene_Mesh(cube,null,this.s3d);
+	cube.translate(-0.25,-0.25,-0.25);
+	this.mesh = new h3d_scene_Mesh(cube);
+	var _this = this.mesh.material.mshader.color__;
+	_this.x = 1.;
+	_this.y = 0.2;
+	_this.z = 0.333333333333333315;
+	_this.w = 0.;
+	this.model = this.mesh;
+};
+$hxClasses["ent.Explosion"] = ent_Explosion;
+ent_Explosion.__name__ = ["ent","Explosion"];
+ent_Explosion.__super__ = ent_StaticEntity;
+ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
+	startTimer: function() {
+		var _gthis = this;
+		this.waitEvent.wait(this.explosionSettings.lifetime,function() {
+			_gthis.level.removeEntity(_gthis);
+		});
+	}
+	,__class__: ent_Explosion
+});
+var ent_MovingEntity = function() {
+	ent_Entity.call(this);
+};
+$hxClasses["ent.MovingEntity"] = ent_MovingEntity;
+ent_MovingEntity.__name__ = ["ent","MovingEntity"];
+ent_MovingEntity.__super__ = ent_Entity;
+ent_MovingEntity.prototype = $extend(ent_Entity.prototype,{
+	__class__: ent_MovingEntity
+});
+var ent_Player = function() {
+	this.isDisposed = false;
+	this.speed = 0.03;
+	ent_MovingEntity.call(this);
+	var cube = new h3d_prim_Cube(0.5,0.5,0.5);
+	cube.translate(-0.25,-0.25,-0.25);
+	this.mesh = new h3d_scene_Mesh(cube);
 	var _this = this.mesh.material.mshader.color__;
 	_this.x = 1.;
 	_this.y = 0.2;
 	_this.z = 0.;
 	_this.w = 0.;
-	var _this1 = this.mesh;
-	_this1.x = 4.25;
-	var f = 1;
-	var b = true;
-	if(b) {
-		_this1.flags |= f;
-	} else {
-		_this1.flags &= ~f;
-	}
-	_this1.y = 3;
-	var f1 = 1;
-	var b1 = true;
-	if(b1) {
-		_this1.flags |= f1;
-	} else {
-		_this1.flags &= ~f1;
-	}
-	_this1.z = 0.0;
-	var f2 = 1;
-	var b2 = true;
-	if(b2) {
-		_this1.flags |= f2;
-	} else {
-		_this1.flags &= ~f2;
-	}
-	var f3 = 1;
-	var b3 = true;
-	if(b3) {
-		_this1.flags |= f3;
-	} else {
-		_this1.flags &= ~f3;
-	}
 	this.model = this.mesh;
+	this.level.placeEntity(4,3,this);
+	this.waitEvent.waitUntil($bind(this,this.onUpdate));
 };
 $hxClasses["ent.Player"] = ent_Player;
 ent_Player.__name__ = ["ent","Player"];
-ent_Player.__super__ = ent_Entity;
-ent_Player.prototype = $extend(ent_Entity.prototype,{
+ent_Player.__super__ = ent_MovingEntity;
+ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 	move: function(x,y) {
 		var _g = this.mesh;
 		var v = _g.x + x;
@@ -930,7 +1054,15 @@ ent_Player.prototype = $extend(ent_Entity.prototype,{
 		this.s3d.camera.pos.y += y;
 		this.s3d.camera.target.y += y;
 	}
+	,placeBomb: function() {
+		var bomb = this.entityFactory.recycleBomb();
+		this.level.placeEntity(this.mesh.x,this.mesh.y,bomb);
+		bomb.startTimer();
+	}
 	,onUpdate: function(dt) {
+		if(this.isDisposed) {
+			return true;
+		}
 		var bounds = this.mesh.getBounds();
 		if(hxd_Key.isDown(87)) {
 			var b = new h3d_col_Bounds();
@@ -989,9 +1121,15 @@ ent_Player.prototype = $extend(ent_Entity.prototype,{
 			}
 		}
 		if(hxd_Key.isPressed(32)) {
-			var bomb = this.entityFactory.recycleBomb();
-			this.level.placeCellEntity(this.mesh.x,this.mesh.y,bomb);
+			this.placeBomb();
 		}
+		return false;
+	}
+	,onHit: function() {
+		this.level.removeEntity(this);
+	}
+	,onDispose: function() {
+		this.isDisposed = true;
 	}
 	,__class__: ent_Player
 });
@@ -32902,6 +33040,64 @@ hxd_Timer.reset = function() {
 	hxd_Timer.oldTime = new Date().getTime() / 1000;
 	hxd_Timer.calc_tmod = 1.;
 };
+var hxd_WaitEvent = function() {
+	this.updateList = [];
+};
+$hxClasses["hxd.WaitEvent"] = hxd_WaitEvent;
+hxd_WaitEvent.__name__ = ["hxd","WaitEvent"];
+hxd_WaitEvent.prototype = {
+	hasEvent: function() {
+		return this.updateList.length > 0;
+	}
+	,clear: function() {
+		this.updateList = [];
+	}
+	,add: function(callb) {
+		this.updateList.push(callb);
+	}
+	,remove: function(callb) {
+		var _g = 0;
+		var _g1 = this.updateList;
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			if(Reflect.compareMethods(e,callb)) {
+				HxOverrides.remove(this.updateList,e);
+				return true;
+			}
+		}
+		return false;
+	}
+	,wait: function(time,callb) {
+		var tmp = function(dt) {
+			time -= dt / hxd_Timer.wantedFPS;
+			if(time < 0) {
+				callb();
+				return true;
+			}
+			return false;
+		};
+		this.updateList.push(tmp);
+	}
+	,waitUntil: function(callb) {
+		this.updateList.push(callb);
+	}
+	,update: function(dt) {
+		if(this.updateList.length == 0) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.updateList.slice();
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			if(f(dt)) {
+				HxOverrides.remove(this.updateList,f);
+			}
+		}
+	}
+	,__class__: hxd_WaitEvent
+};
 var hxd_earcut_EarNode = function() {
 };
 $hxClasses["hxd.earcut.EarNode"] = hxd_earcut_EarNode;
@@ -48911,25 +49107,9 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	return a;
 };
 var map_Level = function() {
+	this.moveEntities = [];
 	this.cellEntities = new haxe_ds_IntMap();
 	this.wallMap = new haxe_ds_IntMap();
-	this.s3d = BomberApp.instance.s3d;
-	this.box = new h3d_prim_Cube(1.0,1.0,1.0);
-	this.box.addNormals();
-	this.box.addUVs();
-	var wallTex = hxd_Res.get_loader().loadImage("metalbox.jpg").toTexture();
-	this.wallMat = new h3d_mat_MeshMaterial(wallTex);
-	this.wallMat.passes.enableLights = true;
-	var _this = this.wallMat;
-	_this.set_castShadows(true);
-	_this.set_receiveShadows(true);
-	var floorTex = hxd_Res.get_loader().loadImage("floor.jpeg").toTexture();
-	this.floorMat = new h3d_mat_MeshMaterial(floorTex);
-	this.floorMat.passes.enableLights = true;
-	var _this1 = this.floorMat;
-	_this1.set_castShadows(true);
-	_this1.set_receiveShadows(true);
-	this.createLevel();
 };
 $hxClasses["map.Level"] = map_Level;
 map_Level.__name__ = ["map","Level"];
@@ -49011,6 +49191,7 @@ map_Level.prototype = {
 	,createLevel: function() {
 		var tiled = hxd_Res.get_loader().loadTiledMap("map1.tmx").toMap();
 		this.mapWidth = tiled.width;
+		this.mapHeight = tiled.height;
 		var _g = 0;
 		var _g1 = tiled.layers;
 		while(_g < _g1.length) {
@@ -49043,9 +49224,6 @@ map_Level.prototype = {
 			}
 		}
 	}
-	,getMapPos: function(x,y) {
-		return { x : Math.floor(x), y : Math.floor(y)};
-	}
 	,placeCellEntity: function(x,y,entity) {
 		var mapPos = this.getMapPos(x,y);
 		var pos = mapPos.y * this.mapWidth + mapPos.x;
@@ -49053,11 +49231,93 @@ map_Level.prototype = {
 		this.s3d.addChild(entity.model);
 		entity.setPos(mapPos.x + 0.5,mapPos.y + 0.5);
 	}
+	,removeCellEntity: function(entity) {
+		var ps = entity.getPos();
+		var mapPos = this.getMapPos(ps.x,ps.y);
+		var pos = mapPos.y * this.mapWidth + mapPos.x;
+		this.cellEntities.remove(pos);
+		this.s3d.removeChild(entity.model);
+	}
 	,getCellEntity: function(x,y) {
 		var pos = y * this.mapWidth + x;
 		return this.cellEntities.h[pos];
 	}
-	,removeCellEntity: function(entity) {
+	,placeMoveEntity: function(x,y,entity) {
+		var mapPos = this.getMapPos(x,y);
+		entity.setPos(mapPos.x + 0.5,mapPos.y + 0.5);
+		this.s3d.addChild(entity.model);
+		this.moveEntities.push(entity);
+	}
+	,removeMoveEntity: function(entity) {
+		HxOverrides.remove(this.moveEntities,entity);
+		this.s3d.removeChild(entity.model);
+	}
+	,init: function() {
+		this.s3d = BomberApp.instance.s3d;
+		this.box = new h3d_prim_Cube(1.0,1.0,1.0);
+		this.box.addNormals();
+		this.box.addUVs();
+		var wallTex = hxd_Res.get_loader().loadImage("metalbox.jpg").toTexture();
+		this.wallMat = new h3d_mat_MeshMaterial(wallTex);
+		this.wallMat.passes.enableLights = true;
+		var _this = this.wallMat;
+		_this.set_castShadows(true);
+		_this.set_receiveShadows(true);
+		var floorTex = hxd_Res.get_loader().loadImage("floor.jpeg").toTexture();
+		this.floorMat = new h3d_mat_MeshMaterial(floorTex);
+		this.floorMat.passes.enableLights = true;
+		var _this1 = this.floorMat;
+		_this1.set_castShadows(true);
+		_this1.set_receiveShadows(true);
+		this.createLevel();
+	}
+	,getMapPos: function(x,y) {
+		return { x : Math.floor(x), y : Math.floor(y)};
+	}
+	,placeEntity: function(x,y,entity) {
+		if(js_Boot.__instanceof(entity,ent_StaticEntity)) {
+			this.placeCellEntity(x,y,entity);
+		} else {
+			this.placeMoveEntity(x,y,entity);
+		}
+	}
+	,getEntity: function(x,y) {
+		var mapPos = this.getMapPos(x,y);
+		var _g = 0;
+		var _g1 = this.moveEntities;
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			var ps = e.getPos();
+			var mps = this.getMapPos(ps.x,ps.y);
+			if(mps.x == mapPos.x && mps.y == mapPos.y) {
+				return e;
+			}
+		}
+		var ce = this.getCellEntity(mapPos.x,mapPos.y);
+		if(ce != null) {
+			return ce;
+		}
+		return null;
+	}
+	,removeEntity: function(entity) {
+		if(js_Boot.__instanceof(entity,ent_StaticEntity)) {
+			this.removeCellEntity(entity);
+		} else {
+			this.removeMoveEntity(entity);
+		}
+		entity.onDispose();
+	}
+	,isWall: function(x,y) {
+		var mapPos = this.getMapPos(x,y);
+		if(x < 0 || x >= this.mapWidth) {
+			return true;
+		}
+		if(y < 0 || y >= this.mapHeight) {
+			return true;
+		}
+		var wall = this.getWall(mapPos.x,mapPos.y);
+		return wall != null;
 	}
 	,isCollideSide: function(bounds,side) {
 		var _gthis = this;

@@ -35,6 +35,11 @@ class BomberApp extends hxd.App {
     public var entityFactory (default, null) : EntityFactory;
 
     /**
+     *  For creating timers
+     */
+    public var waitEvent (default, null) : hxd.WaitEvent;
+
+    /**
      *  Get app
      *  @return BomberApp
      */
@@ -46,13 +51,19 @@ class BomberApp extends hxd.App {
      *  On app init
      */
     override function init() {
-        instance = this;                            
+        instance = this;
         
+        waitEvent = new hxd.WaitEvent ();
         modelCache = new h3d.prim.ModelCache();
-        entityFactory = new EntityFactory ();
+
         level = new Level ();
+        entityFactory = new EntityFactory ();        
+
+        level.init ();
+        entityFactory.init ();
+
         player = new Player ();
-        
+
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
         dir.color.set(0.15, 0.15, 0.15);
         
@@ -64,7 +75,7 @@ class BomberApp extends hxd.App {
         //new h3d.scene.CameraController (s3d).loadFromCamera ();
 	}
 
-	override function update( dt : Float ) {
-        player.onUpdate (dt);
+	override function update( dt : Float ) {        
+        waitEvent.update (dt);
     }
 }

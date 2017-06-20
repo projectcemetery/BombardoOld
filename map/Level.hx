@@ -3,6 +3,8 @@ package map;
 import h3d.scene.Mesh;
 import col.CollideSide;
 import ent.Entity;
+import ent.StaticEntity;
+import ent.MovingEntity;
 
 /**
  *  Game level
@@ -35,6 +37,11 @@ class Level {
     var mapWidth : Int;
 
     /**
+     *  Map height
+     */
+    var mapHeight : Int;
+
+    /**
      *  Map for walls
      */
     var wallMap : Map<Int, Mesh> = new Map<Int, Mesh> ();
@@ -43,6 +50,11 @@ class Level {
      *  Static entities that does not move from cell
      */
     var cellEntities : Map<Int, Entity> = new Map<Int, Entity> ();
+
+    /**
+     *  Moving entities
+     */
+    var moveEntities : Array<Entity> = new Array<Entity> ();
 
     /**
      *  Get mesh wall
@@ -82,6 +94,7 @@ class Level {
     function createLevel () {
         var tiled = hxd.Res.map1.toMap ();        
         mapWidth = tiled.width;        
+        mapHeight = tiled.height;
 
         for (layer in tiled.layers) {
             var x = 0;
@@ -107,9 +120,74 @@ class Level {
     }
 
     /**
+     *  Place static cell entity to map
+     *  @param x - 
+     *  @param y - 
+     *  @param entity - 
+     */
+    function placeCellEntity (x : Float, y : Float, entity : Entity) : Void {        
+        var mapPos = getMapPos (x, y);
+        var pos = mapPos.y * mapWidth + mapPos.x;
+        cellEntities[pos] = entity;
+        s3d.addChild (entity.model);
+        entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
+    }
+
+    /**
+     *  Remove entity from map
+     *  @param entity - 
+     */
+    function removeCellEntity (entity : Entity) {
+        var ps = entity.getPos ();
+        var mapPos = getMapPos (ps.x, ps.y);
+        var pos = mapPos.y * mapWidth + mapPos.x;
+        cellEntities.remove (pos);
+        s3d.removeChild (entity.model);
+    }
+
+    /**
+     *  Return entity from map, by map cell position
+     *  return null if not exists
+     *  @param x - 
+     *  @param y - 
+     *  @return Entity
+     */
+    function getCellEntity (x : Int, y : Int) : Entity {
+        var pos = y * mapWidth + x;
+        return cellEntities[pos];
+    }
+
+    /**
+     *  Place moving entity
+     *  @param x - 
+     *  @param y - 
+     *  @param entity - 
+     */
+    function placeMoveEntity (x : Float, y : Float, entity : Entity) : Void {
+        var mapPos = getMapPos (x, y);
+        entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
+        s3d.addChild (entity.model);
+        moveEntities.push (entity);
+    }
+
+    /**
+     *  Remove moving entity
+     *  @param entity - 
+     */
+    function removeMoveEntity (entity : Entity) : Void {
+        moveEntities.remove (entity);
+        s3d.removeChild (entity.model);
+    }
+
+    /**
      *  Constructor
      */
-    public function new () {
+    public function new () {}
+
+     /**
+     *  Init after create
+     */
+    public function init () {
         s3d = BomberApp.get ().s3d;
 
         box = new h3d.prim.Cube (1.0, 1.0, 1.0);
@@ -131,7 +209,7 @@ class Level {
     }
 
     /**
-     *  Return map pos for entity position
+     *  Return map pos for object
      *  @param x - 
      *  @param y - 
      */
@@ -143,37 +221,64 @@ class Level {
     }
 
     /**
-     *  Place entity to map
-     *  @param x - 
-     *  @param y - 
+     *  Place moving entity
      *  @param entity - 
      */
-    public function placeCellEntity (x : Float, y : Float, entity : Entity) : Void {
-        var mapPos = getMapPos (x, y);
-        var pos = mapPos.y * mapWidth + mapPos.x;
-        cellEntities[pos] = entity;
-        s3d.addChild (entity.model);
-        entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
+    public function placeEntity (x : Float, y : Float, entity : Entity) : Void {
+        if (Std.is (entity, StaticEntity)) {
+            placeCellEntity (x, y, entity);
+        } else {
+            placeMoveEntity (x, y, entity);
+        }
     }
 
     /**
-     *  Return entity from map, by map cell position
-     *  return null if not exists
+     *  Get entity from map
      *  @param x - 
      *  @param y - 
      *  @return Entity
      */
-    public function getCellEntity (x : Int, y : Int) : Entity {
-        var pos = y * mapWidth + x;
-        return cellEntities[pos];
+    public function getEntity (x : Float, y : Float) : Entity {
+        var mapPos = getMapPos (x, y);
+        for (e in moveEntities) {
+            var ps = e.getPos ();
+            var mps = getMapPos (ps.x, ps.y);
+
+            if ((mps.x == mapPos.x) && (mps.y == mapPos.y)) return e;
+        }
+        
+        var ce = getCellEntity (mapPos.x, mapPos.y);
+        if (ce != null) return ce;
+
+        return null;
     }
 
     /**
      *  Remove entity from map
      *  @param entity - 
      */
-    public function removeCellEntity (entity : Entity) {
+    public function removeEntity (entity : Entity) : Void {
+        if (Std.is (entity, StaticEntity)) {
+            removeCellEntity (entity);
+        } else {
+            removeMoveEntity (entity);
+        }
 
+        entity.onDispose ();
+    }
+
+    /**
+     *  Check is cell is undestructable wall
+     *  @param x - 
+     *  @param y - 
+     *  @return Bool
+     */
+    public function isWall (x : Float, y : Float) : Bool {
+        var mapPos = getMapPos (x, y);
+        if ((x < 0) || (x >= mapWidth)) return true;
+        if ((y < 0) || (y >= mapHeight)) return true;
+        var wall = getWall (mapPos.x, mapPos.y);
+        return wall != null;
     }
 
     /**
