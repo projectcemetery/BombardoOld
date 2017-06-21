@@ -1,7 +1,9 @@
 package map;
 
 import h3d.scene.Mesh;
+import h3d.col.Bounds;
 import col.CollideSide;
+import col.CollisionInfo;
 import ent.Entity;
 import ent.StaticEntity;
 import ent.MovingEntity;
@@ -109,14 +111,19 @@ class Level {
                 if (dat > 0) {
                     switch (layer.name) {
                         case "Walls": addWall (x, y);
-                        case "Floor": addFloor (x, y);
+                        case "Floor": addFloor (x, y);                        
                         default:
                     }
                 }   
-
+                
                 x += 1;
             }
-        }
+
+            // Add object to map
+            for (obj in layer.objects) {
+                
+            }
+        }        
     }
 
     /**
@@ -177,6 +184,125 @@ class Level {
     function removeMoveEntity (entity : Entity) : Void {
         moveEntities.remove (entity);
         s3d.removeChild (entity.model);
+    }
+
+    /**
+     *  TODO: profile collisions check
+     *  
+     *  Is collide with entity
+     *  @param bounds - 
+     *  @param side - 
+     */
+    function isEntityCollide (entity : Entity, bounds : Bounds, side : CollideSide, ?except : Entity) : Entity {        
+        inline function checkTopLeft () : Entity {
+            var topY = Std.int (bounds.yMin);
+            var leftX = Std.int (bounds.xMin);
+            return getEntity (leftX, topY);            
+        }
+
+        inline function checkTopRight () : Entity {
+            var topY = Std.int (bounds.yMin);
+            var rightX = Std.int (bounds.xMax);
+            return getEntity (rightX, topY);            
+        }
+
+        inline function checkBottomRight () : Entity {
+            var bottomY = Std.int (bounds.yMax);
+            var rightX = Std.int (bounds.xMax);
+            return getEntity (rightX, bottomY);            
+        }
+        
+        inline function checkBottomLeft () : Entity {
+            var bottomY = Std.int (bounds.yMax);
+            var leftX = Std.int (bounds.xMin);
+            return getEntity (leftX, bottomY);
+        }
+
+        var ent : Entity = null;
+
+        switch (side) {
+            case CollideSide.Top:
+                ent = checkTopLeft ();
+                if (ent == null) ent = checkTopRight ();
+            case CollideSide.Right:
+                ent = checkTopRight ();
+                if (ent == null) ent = checkBottomRight ();
+            case CollideSide.Bottom:
+                ent = checkBottomRight ();
+                if (ent == null) ent = checkBottomLeft ();
+            case CollideSide.Left:
+                ent = checkBottomLeft ();
+                if (ent == null) ent = checkTopLeft ();
+            default: {}
+        }
+
+        if (except != null && ent == except) return null;
+        if ((ent != null) && (ent != entity)) return ent;
+        return null;
+    }
+
+    /**
+     *  Check if entity collide with level from bounds side
+     *  @return Bool
+     */
+    function isWallCollide (bounds : h3d.col.Bounds, side : CollideSide) : Bool {
+
+        inline function checkCollide (m :Mesh) : Bool {
+            var bou = m.getBounds ();
+            return bounds.collide (bou);
+        }
+
+        inline function checkTopLeft () : Bool {            
+            var topY = Std.int (bounds.yMin);
+            var leftX = Std.int (bounds.xMin);
+            var wallMesh = getWall (leftX, topY);
+            if (wallMesh != null) return checkCollide (wallMesh);
+            return false;
+        }
+
+        inline function checkTopRight () : Bool {
+            var topY = Std.int (bounds.yMin);
+            var rightX = Std.int (bounds.xMax);
+            var wallMesh = getWall (rightX, topY);
+            if (wallMesh != null) return checkCollide (wallMesh);
+            return false;
+        }
+
+        inline function checkBottomLeft () : Bool {
+            var bottomY = Std.int (bounds.yMax);
+            var leftX = Std.int (bounds.xMin);
+            var wallMesh = getWall (leftX, bottomY);
+            if (wallMesh != null) return checkCollide (wallMesh);
+            return false;
+        }
+
+        inline function checkBottomRight () : Bool {
+            var bottomY = Std.int (bounds.yMax);
+            var rightX = Std.int (bounds.xMax);
+            var wallMesh = getWall (rightX, bottomY);
+            if (wallMesh != null) return checkCollide (wallMesh);
+            return false;
+        }
+
+        // Check top
+        if (side == CollideSide.Top) {
+            // Check left top
+            if (checkTopLeft () || checkTopRight ()) return true;
+        } 
+        // Check left
+        else if (side == CollideSide.Left) {
+            if (checkTopLeft () || checkBottomLeft ()) return true;
+        }
+        // Check right
+        else if (side == CollideSide.Right) {
+            if (checkTopRight () || checkBottomRight ()) return true;
+        }
+        // Check bottom
+        else if (side == CollideSide.Bottom) {
+            if (checkBottomLeft () || checkBottomRight ()) return true;
+        }
+
+        return false;
     }
 
     /**
@@ -281,67 +407,26 @@ class Level {
         return wall != null;
     }
 
+
     /**
-     *  Check if entity collide with level from bounds side
-     *  @return Bool
+     *  Check collision for array of bounds. Fills the entry info. Does not create new array
+     *  @param info - 
+     *  @return Array<CollisionInfo>
      */
-    public function isCollideSide (bounds : h3d.col.Bounds, side : CollideSide) : Bool {
+    public function isCollide (info : Array<CollisionInfo>) : Array<CollisionInfo> {
+        for (b in info) {
+            if (isWallCollide (b.bounds, b.side)) {
+                b.isCollide = true;
+                continue;
+            }
 
-        inline function checkCollide (m :Mesh) : Bool {
-            var bou = m.getBounds ();
-            return bounds.collide (bou);
-        }
+            var ent = isEntityCollide (b.entity1, b.bounds, b.side, b.exceptEntity);
 
-        inline function checkTopLeft () : Bool {            
-            var topY = Std.int (bounds.yMin);
-            var leftX = Std.int (bounds.xMin);
-            var wallMesh = getWall (leftX, topY);
-            if (wallMesh != null) return checkCollide (wallMesh);
-            return false;
+            if (ent != null) {
+                b.entity2 = ent;
+                b.isCollide = true;
+            }
         }
-
-        inline function checkTopRight () : Bool {
-            var topY = Std.int (bounds.yMin);
-            var rightX = Std.int (bounds.xMax);
-            var wallMesh = getWall (rightX, topY);
-            if (wallMesh != null) return checkCollide (wallMesh);
-            return false;
-        }
-
-        inline function checkBottomLeft () : Bool {
-            var bottomY = Std.int (bounds.yMax);
-            var leftX = Std.int (bounds.xMin);
-            var wallMesh = getWall (leftX, bottomY);
-            if (wallMesh != null) return checkCollide (wallMesh);
-            return false;
-        }
-
-        inline function checkBottomRight () : Bool {
-            var bottomY = Std.int (bounds.yMax);
-            var rightX = Std.int (bounds.xMax);
-            var wallMesh = getWall (rightX, bottomY);
-            if (wallMesh != null) return checkCollide (wallMesh);
-            return false;
-        }
-
-        // Check top
-        if (side == CollideSide.Top) {
-            // Check left top
-            if (checkTopLeft () || checkTopRight ()) return true;
-        } 
-        // Check left
-        else if (side == CollideSide.Left) {
-            if (checkTopLeft () || checkBottomLeft ()) return true;
-        }
-        // Check right
-        else if (side == CollideSide.Right) {
-            if (checkTopRight () || checkBottomRight ()) return true;
-        }
-        // Check bottom
-        else if (side == CollideSide.Bottom) {
-            if (checkBottomLeft () || checkBottomRight ()) return true;
-        }
-
-        return false;
+        return info;
     }
 }

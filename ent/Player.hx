@@ -2,6 +2,7 @@ package ent;
 
 import map.Level;
 import col.CollideSide;
+import col.CollisionInfo;
 import ent.Bomb;
 import ent.EntityFactory;
 
@@ -21,9 +22,14 @@ class Player extends MovingEntity {
     var speed : Float = 0.03;
 
     /**
+     *  Placed bomb
+     */
+    var placedBomb : Bomb = null;
+
+    /**
      *  Is entity disposed
      */
-    var isDisposed : Bool = false;
+    var isDisposed : Bool = false;    
 
     /**
      *  Move
@@ -44,9 +50,9 @@ class Player extends MovingEntity {
      */
     function placeBomb () : Void {
         // Place bomb
-        var bomb = entityFactory.recycleBomb ();
-        level.placeEntity (mesh.x, mesh.y, bomb);
-        bomb.startTimer ();
+        placedBomb = entityFactory.recycleBomb ();
+        level.placeEntity (mesh.x, mesh.y, placedBomb);
+        placedBomb.startTimer ();
     }
 
     /**
@@ -57,27 +63,68 @@ class Player extends MovingEntity {
         if (isDisposed) return true;
 
         var bounds = mesh.getBounds ();
+        var cols = new Array<CollisionInfo> ();        
 
         if (hxd.Key.isDown (hxd.Key.W)) {
             var b = bounds.clone();
             b.yMin += -speed * dt;
-            if (!level.isCollideSide (b, CollideSide.Top)) move (0, -speed * dt);
+            cols.push ({
+                entity1 : this,
+                side : CollideSide.Top,
+                bounds : b,                
+            });
         } 
         if (hxd.Key.isDown (hxd.Key.S)) {
             var b = bounds.clone();
             b.yMax += speed * dt;
-            if (!level.isCollideSide (b, CollideSide.Bottom)) move (0, speed * dt);
+            cols.push ({
+                entity1 : this,
+                side : CollideSide.Bottom,
+                bounds : b                
+            });
         } 
         if (hxd.Key.isDown (hxd.Key.A)) {
             var b = bounds.clone();
             b.xMin += -speed * dt;
-            if (!level.isCollideSide (b, CollideSide.Left)) move (-speed * dt, 0);
+            cols.push ({
+                entity1 : this,
+                side : CollideSide.Left,
+                bounds : b                
+            });
         } 
         if (hxd.Key.isDown (hxd.Key.D)) {
             var b = bounds.clone();
             b.xMax += speed * dt;
-            if (!level.isCollideSide (b, CollideSide.Right)) move (speed * dt, 0);
+            cols.push ({
+                entity1 : this,
+                side : CollideSide.Right,
+                bounds : b                
+            });
         }
+
+        cols = level.isCollide (cols);
+
+        var wasBombCollide = false;
+        for (c in cols) {
+            if ((placedBomb != null) && (c.entity2 == placedBomb)) {
+                trace ("GOOD");
+                c.isCollide = false;
+                wasBombCollide = true;
+            }
+
+            if (!c.isCollide) {
+                switch (c.side) {
+                    case CollideSide.Top: move (0, -speed * dt);
+                    case CollideSide.Bottom: move (0, speed * dt);
+                    case CollideSide.Left: move (-speed * dt, 0);
+                    case CollideSide.Right: move (speed * dt, 0);
+                    default: {}
+                }
+            }
+        }
+
+        if (!wasBombCollide) placedBomb = null;
+
         if (hxd.Key.isPressed (hxd.Key.SPACE)) {
             placeBomb ();
         }
