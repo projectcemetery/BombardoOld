@@ -2,11 +2,12 @@ package map;
 
 import h3d.scene.Mesh;
 import h3d.col.Bounds;
-import col.CollideSide;
+import col.Side;
 import col.CollisionInfo;
 import ent.Entity;
 import ent.StaticEntity;
 import ent.MovingEntity;
+import ent.EntityFactory;
 
 /**
  *  Game level
@@ -17,6 +18,11 @@ class Level {
      *  Main 3d scene
      */
     var s3d : h3d.scene.Scene;
+
+    /**
+     *  Entity factory
+     */
+    var entityFactory : EntityFactory;
 
     /**
      *  Box for walls and floor
@@ -193,7 +199,7 @@ class Level {
      *  @param bounds - 
      *  @param side - 
      */
-    function isEntityCollide (entity : Entity, bounds : Bounds, side : CollideSide, ?except : Entity) : Entity {        
+    function isEntityCollide (entity : Entity, bounds : Bounds, side : Side, ?except : Entity) : Entity {        
         inline function checkTopLeft () : Entity {
             var topY = Std.int (bounds.yMin);
             var leftX = Std.int (bounds.xMin);
@@ -221,16 +227,16 @@ class Level {
         var ent : Entity = null;
 
         switch (side) {
-            case CollideSide.Top:
+            case Side.Top:
                 ent = checkTopLeft ();
                 if (ent == null) ent = checkTopRight ();
-            case CollideSide.Right:
+            case Side.Right:
                 ent = checkTopRight ();
                 if (ent == null) ent = checkBottomRight ();
-            case CollideSide.Bottom:
+            case Side.Bottom:
                 ent = checkBottomRight ();
                 if (ent == null) ent = checkBottomLeft ();
-            case CollideSide.Left:
+            case Side.Left:
                 ent = checkBottomLeft ();
                 if (ent == null) ent = checkTopLeft ();
             default: {}
@@ -245,7 +251,7 @@ class Level {
      *  Check if entity collide with level from bounds side
      *  @return Bool
      */
-    function isWallCollide (bounds : h3d.col.Bounds, side : CollideSide) : Bool {
+    function isWallCollide (bounds : h3d.col.Bounds, side : Side) : Bool {
 
         inline function checkCollide (m :Mesh) : Bool {
             var bou = m.getBounds ();
@@ -285,20 +291,20 @@ class Level {
         }
 
         // Check top
-        if (side == CollideSide.Top) {
+        if (side == Side.Top) {
             // Check left top
             if (checkTopLeft () || checkTopRight ()) return true;
         } 
         // Check left
-        else if (side == CollideSide.Left) {
+        else if (side == Side.Left) {
             if (checkTopLeft () || checkBottomLeft ()) return true;
         }
         // Check right
-        else if (side == CollideSide.Right) {
+        else if (side == Side.Right) {
             if (checkTopRight () || checkBottomRight ()) return true;
         }
         // Check bottom
-        else if (side == CollideSide.Bottom) {
+        else if (side == Side.Bottom) {
             if (checkBottomLeft () || checkBottomRight ()) return true;
         }
 
@@ -315,6 +321,7 @@ class Level {
      */
     public function init () {
         s3d = BomberApp.get ().s3d;
+        entityFactory = BomberApp.get ().entityFactory;
 
         box = new h3d.prim.Cube (1.0, 1.0, 1.0);
         //box.translate (-0.5, -0.5, -0.5);
@@ -332,6 +339,17 @@ class Level {
         floorMat.shadows = true;
 
         createLevel ();
+        var mob = entityFactory.recicleMob ();
+        placeEntity (6,1, mob);
+
+        var mob = entityFactory.recicleMob ();
+        placeEntity (7,1, mob);
+
+        var mob = entityFactory.recicleMob ();
+        placeEntity (8,1, mob);
+
+        var mob = entityFactory.recicleMob ();
+        placeEntity (9,1, mob);
     }
 
     /**

@@ -550,6 +550,13 @@ Type.createEnum = function(e,constr,params) {
 	}
 	return f;
 };
+Type.createEnumIndex = function(e,index,params) {
+	var c = e.__constructs__[index];
+	if(c == null) {
+		throw new js__$Boot_HaxeError(index + " is not a valid enum constructor index");
+	}
+	return Type.createEnum(e,c,params);
+};
 Type.enumEq = function(a,b) {
 	if(a == b) {
 		return true;
@@ -750,21 +757,22 @@ Xml.prototype = {
 	}
 	,__class__: Xml
 };
-var col_CollideSide = $hxClasses["col.CollideSide"] = { __ename__ : true, __constructs__ : ["Top","Right","Bottom","Left"] };
-col_CollideSide.Top = ["Top",0];
-col_CollideSide.Top.toString = $estr;
-col_CollideSide.Top.__enum__ = col_CollideSide;
-col_CollideSide.Right = ["Right",1];
-col_CollideSide.Right.toString = $estr;
-col_CollideSide.Right.__enum__ = col_CollideSide;
-col_CollideSide.Bottom = ["Bottom",2];
-col_CollideSide.Bottom.toString = $estr;
-col_CollideSide.Bottom.__enum__ = col_CollideSide;
-col_CollideSide.Left = ["Left",3];
-col_CollideSide.Left.toString = $estr;
-col_CollideSide.Left.__enum__ = col_CollideSide;
-col_CollideSide.__empty_constructs__ = [col_CollideSide.Top,col_CollideSide.Right,col_CollideSide.Bottom,col_CollideSide.Left];
+var col_Side = $hxClasses["col.Side"] = { __ename__ : true, __constructs__ : ["Top","Right","Bottom","Left"] };
+col_Side.Top = ["Top",0];
+col_Side.Top.toString = $estr;
+col_Side.Top.__enum__ = col_Side;
+col_Side.Right = ["Right",1];
+col_Side.Right.toString = $estr;
+col_Side.Right.__enum__ = col_Side;
+col_Side.Bottom = ["Bottom",2];
+col_Side.Bottom.toString = $estr;
+col_Side.Bottom.__enum__ = col_Side;
+col_Side.Left = ["Left",3];
+col_Side.Left.toString = $estr;
+col_Side.Left.__enum__ = col_Side;
+col_Side.__empty_constructs__ = [col_Side.Top,col_Side.Right,col_Side.Bottom,col_Side.Left];
 var ent_Entity = function() {
+	this.isDisposed = false;
 	this.waitEvent = BomberApp.instance.waitEvent;
 	this.s3d = BomberApp.instance.s3d;
 	this.modelCache = BomberApp.instance.modelCache;
@@ -774,7 +782,31 @@ var ent_Entity = function() {
 $hxClasses["ent.Entity"] = ent_Entity;
 ent_Entity.__name__ = ["ent","Entity"];
 ent_Entity.prototype = {
-	reset: function() {
+	setOnUpdate: function(val) {
+		var _gthis = this;
+		if(this.onUpdateInternal == null) {
+			this.onUpdateInternal = val;
+			this.waitEvent.waitUntil(function(dt) {
+				if(_gthis.isDisposed) {
+					return true;
+				}
+				_gthis.onUpdateInternal(dt);
+				return false;
+			});
+		} else {
+			this.onUpdateInternal = val;
+		}
+	}
+	,setOnFilterCollision: function(filter) {
+		this.onFilterCollisionInternal = filter;
+	}
+	,setOnMoveComplete: function(call) {
+		this.onMoveCompleteInternal = call;
+	}
+	,setOnCollision: function(call) {
+		this.onCollisionInternal = call;
+	}
+	,reset: function() {
 	}
 	,getPos: function() {
 		return new h3d_col_Point(this.model.x,this.model.y,this.model.z);
@@ -800,8 +832,141 @@ ent_Entity.prototype = {
 		}
 	}
 	,onDispose: function() {
+		this.isDisposed = true;
 	}
 	,onHit: function() {
+	}
+	,move: function(dx,dy) {
+		if(dx < 0.001 && dx > -0.001 && (dy < 0.001 && dy > -0.001)) {
+			return;
+		}
+		var cols = [];
+		var bounds = this.model.getBounds();
+		if(dx > 0) {
+			var b = new h3d_col_Bounds();
+			b.xMin = bounds.xMin;
+			b.xMax = bounds.xMax;
+			b.yMin = bounds.yMin;
+			b.yMax = bounds.yMax;
+			b.zMin = bounds.zMin;
+			b.zMax = bounds.zMax;
+			var b1 = b;
+			b1.xMax += dx;
+			cols.push({ entity1 : this, side : col_Side.Right, bounds : b1});
+		} else if(dx < 0) {
+			var b2 = new h3d_col_Bounds();
+			b2.xMin = bounds.xMin;
+			b2.xMax = bounds.xMax;
+			b2.yMin = bounds.yMin;
+			b2.yMax = bounds.yMax;
+			b2.zMin = bounds.zMin;
+			b2.zMax = bounds.zMax;
+			var b3 = b2;
+			b3.xMin += dx;
+			cols.push({ entity1 : this, side : col_Side.Left, bounds : b3});
+		}
+		if(dy > 0) {
+			var b4 = new h3d_col_Bounds();
+			b4.xMin = bounds.xMin;
+			b4.xMax = bounds.xMax;
+			b4.yMin = bounds.yMin;
+			b4.yMax = bounds.yMax;
+			b4.zMin = bounds.zMin;
+			b4.zMax = bounds.zMax;
+			var b5 = b4;
+			b5.yMax += dy;
+			cols.push({ entity1 : this, side : col_Side.Bottom, bounds : b5});
+		} else if(dy < 0) {
+			var b6 = new h3d_col_Bounds();
+			b6.xMin = bounds.xMin;
+			b6.xMax = bounds.xMax;
+			b6.yMin = bounds.yMin;
+			b6.yMax = bounds.yMax;
+			b6.zMin = bounds.zMin;
+			b6.zMax = bounds.zMax;
+			var b7 = b6;
+			b7.yMin += dy;
+			cols.push({ entity1 : this, side : col_Side.Top, bounds : b7});
+		}
+		cols = this.level.isCollide(cols);
+		var cdx = 0.0;
+		var cdy = 0.0;
+		var colCompl = [];
+		var _g = 0;
+		while(_g < cols.length) {
+			var c = cols[_g];
+			++_g;
+			if(this.onFilterCollisionInternal != null) {
+				if(this.onFilterCollisionInternal(c)) {
+					c.isCollide = false;
+				}
+			}
+			if(!c.isCollide) {
+				var _g1 = c.side;
+				switch(_g1[1]) {
+				case 0:
+					var _g11 = this.model;
+					var v = _g11.y + dy;
+					_g11.y = v;
+					var f = 1;
+					var b8 = true;
+					if(b8) {
+						_g11.flags |= f;
+					} else {
+						_g11.flags &= ~f;
+					}
+					cdy = dy;
+					break;
+				case 1:
+					var _g12 = this.model;
+					var v1 = _g12.x + dx;
+					_g12.x = v1;
+					var f1 = 1;
+					var b9 = true;
+					if(b9) {
+						_g12.flags |= f1;
+					} else {
+						_g12.flags &= ~f1;
+					}
+					cdx = dx;
+					break;
+				case 2:
+					var _g13 = this.model;
+					var v2 = _g13.y + dy;
+					_g13.y = v2;
+					var f2 = 1;
+					var b10 = true;
+					if(b10) {
+						_g13.flags |= f2;
+					} else {
+						_g13.flags &= ~f2;
+					}
+					cdy = dy;
+					break;
+				case 3:
+					var _g14 = this.model;
+					var v3 = _g14.x + dx;
+					_g14.x = v3;
+					var f3 = 1;
+					var b11 = true;
+					if(b11) {
+						_g14.flags |= f3;
+					} else {
+						_g14.flags &= ~f3;
+					}
+					cdx = dx;
+					break;
+				}
+			} else {
+				colCompl.push(c);
+			}
+		}
+		if(this.onCollisionInternal != null) {
+			this.onCollisionInternal(colCompl);
+		}
+		if(this.onMoveCompleteInternal != null) {
+			this.onMoveCompleteInternal(cdx,cdy);
+		}
 	}
 	,__class__: ent_Entity
 };
@@ -972,6 +1137,9 @@ ent_EntityFactory.prototype = {
 	,recycleExplosion: function() {
 		return new ent_Explosion(this.explosionSettings);
 	}
+	,recicleMob: function() {
+		return new ent_Mob();
+	}
 	,__class__: ent_EntityFactory
 };
 var ent_Explosion = function(explosionSettings) {
@@ -999,6 +1167,60 @@ ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
 	}
 	,__class__: ent_Explosion
 });
+var ent_Mob = function() {
+	this.speed = 0.015;
+	ent_Entity.call(this);
+	var cube = new h3d_prim_Cube(0.6,0.6,0.6);
+	cube.translate(-0.3,-0.3,-0.3);
+	this.mesh = new h3d_scene_Mesh(cube);
+	var _this = this.mesh.material.mshader.color__;
+	_this.x = 0.0666666666666666657;
+	_this.y = 0.2;
+	_this.z = 0.686274509803921573;
+	_this.w = 0.;
+	this.model = this.mesh;
+	this.setOnCollision($bind(this,this.onCollision));
+	this.setOnUpdate($bind(this,this.onUpdate));
+	this.direction = this.newDirection();
+};
+$hxClasses["ent.Mob"] = ent_Mob;
+ent_Mob.__name__ = ["ent","Mob"];
+ent_Mob.__super__ = ent_Entity;
+ent_Mob.prototype = $extend(ent_Entity.prototype,{
+	newDirection: function() {
+		var intDir = Math.floor(Math.random() * 4);
+		if(intDir > 3) {
+			intDir = 3;
+		}
+		return Type.createEnumIndex(col_Side,intDir,null);
+	}
+	,onCollision: function(cols) {
+		if(cols.length > 0) {
+			this.direction = this.newDirection();
+		}
+	}
+	,onUpdate: function(dt) {
+		var _g = this.direction;
+		switch(_g[1]) {
+		case 0:
+			this.move(0,-dt * this.speed);
+			break;
+		case 1:
+			this.move(dt * this.speed,0);
+			break;
+		case 2:
+			this.move(0,dt * this.speed);
+			break;
+		case 3:
+			this.move(-dt * this.speed,0);
+			break;
+		}
+	}
+	,onHit: function() {
+		this.level.removeEntity(this);
+	}
+	,__class__: ent_Mob
+});
 var ent_MovingEntity = function() {
 	ent_Entity.call(this);
 };
@@ -1009,7 +1231,7 @@ ent_MovingEntity.prototype = $extend(ent_Entity.prototype,{
 	__class__: ent_MovingEntity
 });
 var ent_Player = function() {
-	this.isDisposed = false;
+	this.wasBombCollide = false;
 	this.placedBomb = null;
 	this.speed = 0.03;
 	ent_MovingEntity.call(this);
@@ -1023,139 +1245,61 @@ var ent_Player = function() {
 	_this.w = 0.;
 	this.model = this.mesh;
 	this.level.placeEntity(4,3,this);
-	this.waitEvent.waitUntil($bind(this,this.onUpdate));
+	this.setOnFilterCollision($bind(this,this.onFilterCollision));
+	this.setOnMoveComplete($bind(this,this.onMoveComplete));
+	this.setOnUpdate($bind(this,this.onUpdate));
 };
 $hxClasses["ent.Player"] = ent_Player;
 ent_Player.__name__ = ["ent","Player"];
 ent_Player.__super__ = ent_MovingEntity;
 ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
-	move: function(x,y) {
-		var _g = this.mesh;
-		var v = _g.x + x;
-		_g.x = v;
-		var f = 1;
-		var b = true;
-		if(b) {
-			_g.flags |= f;
-		} else {
-			_g.flags &= ~f;
-		}
-		this.s3d.camera.pos.x += x;
-		this.s3d.camera.target.x += x;
-		var _g1 = this.mesh;
-		var v1 = _g1.y + y;
-		_g1.y = v1;
-		var f1 = 1;
-		var b1 = true;
-		if(b1) {
-			_g1.flags |= f1;
-		} else {
-			_g1.flags &= ~f1;
-		}
-		this.s3d.camera.pos.y += y;
-		this.s3d.camera.target.y += y;
+	onMoveComplete: function(dx,dy) {
+		this.s3d.camera.pos.x += dx;
+		this.s3d.camera.target.x += dx;
+		this.s3d.camera.pos.y += dy;
+		this.s3d.camera.target.y += dy;
 	}
 	,placeBomb: function() {
 		this.placedBomb = this.entityFactory.recycleBomb();
 		this.level.placeEntity(this.mesh.x,this.mesh.y,this.placedBomb);
 		this.placedBomb.startTimer();
 	}
-	,onUpdate: function(dt) {
-		if(this.isDisposed) {
+	,onFilterCollision: function(c) {
+		if(this.placedBomb != null && c.entity2 == this.placedBomb) {
+			this.wasBombCollide = true;
 			return true;
 		}
-		var bounds = this.mesh.getBounds();
-		var cols = [];
+		return false;
+	}
+	,onUpdate: function(dt) {
+		if(this.isDisposed) {
+			return;
+		}
+		var dx = 0.0;
+		var dy = 0.0;
 		if(hxd_Key.isDown(87)) {
-			var b = new h3d_col_Bounds();
-			b.xMin = bounds.xMin;
-			b.xMax = bounds.xMax;
-			b.yMin = bounds.yMin;
-			b.yMax = bounds.yMax;
-			b.zMin = bounds.zMin;
-			b.zMax = bounds.zMax;
-			var b1 = b;
-			b1.yMin += -this.speed * dt;
-			cols.push({ entity1 : this, side : col_CollideSide.Top, bounds : b1});
+			dy = -this.speed * dt;
 		}
 		if(hxd_Key.isDown(83)) {
-			var b2 = new h3d_col_Bounds();
-			b2.xMin = bounds.xMin;
-			b2.xMax = bounds.xMax;
-			b2.yMin = bounds.yMin;
-			b2.yMax = bounds.yMax;
-			b2.zMin = bounds.zMin;
-			b2.zMax = bounds.zMax;
-			var b3 = b2;
-			b3.yMax += this.speed * dt;
-			cols.push({ entity1 : this, side : col_CollideSide.Bottom, bounds : b3});
+			dy = this.speed * dt;
 		}
 		if(hxd_Key.isDown(65)) {
-			var b4 = new h3d_col_Bounds();
-			b4.xMin = bounds.xMin;
-			b4.xMax = bounds.xMax;
-			b4.yMin = bounds.yMin;
-			b4.yMax = bounds.yMax;
-			b4.zMin = bounds.zMin;
-			b4.zMax = bounds.zMax;
-			var b5 = b4;
-			b5.xMin += -this.speed * dt;
-			cols.push({ entity1 : this, side : col_CollideSide.Left, bounds : b5});
+			dx = -this.speed * dt;
 		}
 		if(hxd_Key.isDown(68)) {
-			var b6 = new h3d_col_Bounds();
-			b6.xMin = bounds.xMin;
-			b6.xMax = bounds.xMax;
-			b6.yMin = bounds.yMin;
-			b6.yMax = bounds.yMax;
-			b6.zMin = bounds.zMin;
-			b6.zMax = bounds.zMax;
-			var b7 = b6;
-			b7.xMax += this.speed * dt;
-			cols.push({ entity1 : this, side : col_CollideSide.Right, bounds : b7});
+			dx = this.speed * dt;
 		}
-		cols = this.level.isCollide(cols);
-		var wasBombCollide = false;
-		var _g = 0;
-		while(_g < cols.length) {
-			var c = cols[_g];
-			++_g;
-			if(this.placedBomb != null && c.entity2 == this.placedBomb) {
-				haxe_Log.trace("GOOD",{ fileName : "Player.hx", lineNumber : 110, className : "ent.Player", methodName : "onUpdate"});
-				c.isCollide = false;
-				wasBombCollide = true;
-			}
-			if(!c.isCollide) {
-				var _g1 = c.side;
-				switch(_g1[1]) {
-				case 0:
-					this.move(0,-this.speed * dt);
-					break;
-				case 1:
-					this.move(this.speed * dt,0);
-					break;
-				case 2:
-					this.move(0,this.speed * dt);
-					break;
-				case 3:
-					this.move(-this.speed * dt,0);
-					break;
-				}
-			}
-		}
-		if(!wasBombCollide) {
+		this.wasBombCollide = false;
+		this.move(dx,dy);
+		if(!this.wasBombCollide) {
 			this.placedBomb = null;
 		}
 		if(hxd_Key.isPressed(32)) {
 			this.placeBomb();
 		}
-		return false;
 	}
 	,onHit: function() {
 		this.level.removeEntity(this);
-	}
-	,onDispose: function() {
-		this.isDisposed = true;
 	}
 	,__class__: ent_Player
 });
@@ -49248,6 +49392,12 @@ map_Level.prototype = {
 				}
 				++x;
 			}
+			var _g21 = 0;
+			var _g31 = layer.objects;
+			while(_g21 < _g31.length) {
+				var obj = _g31[_g21];
+				++_g21;
+			}
 		}
 	}
 	,placeCellEntity: function(x,y,entity) {
@@ -49333,7 +49483,7 @@ map_Level.prototype = {
 	}
 	,isWallCollide: function(bounds,side) {
 		var _gthis = this;
-		if(side == col_CollideSide.Top) {
+		if(side == col_Side.Top) {
 			var tmp;
 			var topY = bounds.yMin | 0;
 			var leftX = bounds.xMin | 0;
@@ -49361,7 +49511,7 @@ map_Level.prototype = {
 			if(tmp) {
 				return true;
 			}
-		} else if(side == col_CollideSide.Left) {
+		} else if(side == col_Side.Left) {
 			var tmp2;
 			var topY2 = bounds.yMin | 0;
 			var leftX1 = bounds.xMin | 0;
@@ -49389,7 +49539,7 @@ map_Level.prototype = {
 			if(tmp2) {
 				return true;
 			}
-		} else if(side == col_CollideSide.Right) {
+		} else if(side == col_Side.Right) {
 			var tmp4;
 			var topY3 = bounds.yMin | 0;
 			var rightX1 = bounds.xMax | 0;
@@ -49417,7 +49567,7 @@ map_Level.prototype = {
 			if(tmp4) {
 				return true;
 			}
-		} else if(side == col_CollideSide.Bottom) {
+		} else if(side == col_Side.Bottom) {
 			var tmp6;
 			var bottomY2 = bounds.yMax | 0;
 			var leftX3 = bounds.xMin | 0;
@@ -49450,6 +49600,7 @@ map_Level.prototype = {
 	}
 	,init: function() {
 		this.s3d = BomberApp.instance.s3d;
+		this.entityFactory = BomberApp.instance.entityFactory;
 		this.box = new h3d_prim_Cube(1.0,1.0,1.0);
 		this.box.addNormals();
 		this.box.addUVs();
@@ -49466,6 +49617,14 @@ map_Level.prototype = {
 		_this1.set_castShadows(true);
 		_this1.set_receiveShadows(true);
 		this.createLevel();
+		var mob = this.entityFactory.recicleMob();
+		this.placeEntity(6,1,mob);
+		var mob1 = this.entityFactory.recicleMob();
+		this.placeEntity(7,1,mob1);
+		var mob2 = this.entityFactory.recicleMob();
+		this.placeEntity(8,1,mob2);
+		var mob3 = this.entityFactory.recicleMob();
+		this.placeEntity(9,1,mob3);
 	}
 	,getMapPos: function(x,y) {
 		return { x : Math.floor(x), y : Math.floor(y)};

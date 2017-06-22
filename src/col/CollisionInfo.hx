@@ -26,7 +26,7 @@ typedef CollisionInfo = {
     /**
      *  Collision side
      */
-    var side : CollideSide;
+    var side : Side;
 
     /**
      *  Some bounds

@@ -1,9 +1,9 @@
 package col;
 
 /**
- *  Collision sides
+ *  Sides
  */
-enum CollideSide {
+enum Side {
     Top;
     Right;
     Bottom;

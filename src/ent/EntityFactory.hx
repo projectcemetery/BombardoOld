@@ -62,4 +62,13 @@ class EntityFactory {
         // TODO recycle
         return new Explosion (explosionSettings);
     }
+
+    /**
+     *  Get mob
+     *  @return Mob
+     */
+    public function recicleMob () : Mob {
+        // TODO recicle
+        return new Mob ();
+    }
 }

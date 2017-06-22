@@ -57,7 +57,7 @@ class BomberApp extends hxd.App {
         modelCache = new h3d.prim.ModelCache();
 
         level = new Level ();
-        entityFactory = new EntityFactory ();        
+        entityFactory = new EntityFactory ();
 
         level.init ();
         entityFactory.init ();
@@ -70,12 +70,14 @@ class BomberApp extends hxd.App {
         s3d.camera.zNear = 6;
         s3d.camera.zFar = 30;
         s3d.camera.pos.set (4.0, 8.0, 20);
-        s3d.camera.target.set (4.0, 3, 0);
+        s3d.camera.target.set (4.0, 3, 0);        
        
         //new h3d.scene.CameraController (s3d).loadFromCamera ();
 	}
 
 	override function update( dt : Float ) {        
         waitEvent.update (dt);
+
+        //trace (engine.drawCalls, engine.drawTriangles);
     }
 }
