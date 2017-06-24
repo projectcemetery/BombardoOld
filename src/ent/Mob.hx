@@ -78,6 +78,7 @@ class Mob extends Entity {
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
+        BomberApp.get ().onMobKilled ();
         level.removeEntity (this);
     }
 }

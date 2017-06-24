@@ -1,0 +1,122 @@
+package hud;
+
+import h2d.Scene;
+import h2d.Sprite;
+import h2d.Bitmap;
+import h2d.Font;
+
+class Hud extends Sprite {
+
+    /**
+     *  2d scene
+     */
+    var s2d : Scene;
+
+    /**
+     *  Space between items
+     */
+    var spacing : Int = 10;
+
+    /**
+     *  Image for bomb count
+     */
+    var bombImage : Bitmap;
+
+    /**
+     *  Image for explosion length
+     */
+    var explosionImage : Bitmap;
+
+    /**
+     *  Image for scores
+     */
+    var scoreImage : Bitmap;
+
+    /**
+     *  Text for score
+     */
+    var scoreTxt : h2d.Text;
+
+    /**
+     *  Bomb count that player can place
+     */
+    public var bombCount (default, set) : Int;    
+    function set_bombCount (v : Int) : Int {
+        return 0;
+    }
+    
+    /**
+     *  Player score
+     */
+    var scoreInternal : Int;    
+    public var score (get, set) : Int;    
+
+    /**
+     *  Get player score
+     *  @return Int
+     */
+    function get_score () : Int {
+        return scoreInternal;
+    }
+
+    /**
+     *  Set player score
+     *  @param v - 
+     *  @return Int
+     */
+    function set_score (v : Int) : Int {
+        scoreInternal = v;
+        scoreTxt.text = Std.string (v);
+        return v;
+    }
+
+    /**
+     *  Constuctor
+     */
+    public function new () {
+        super ();
+    }
+
+    /**
+     *  On post create
+     */
+    public function init () {
+        s2d = BomberApp.get ().s2d;
+
+        var font = hxd.Res.trueTypeFont.build(24);
+        
+        var bombTile = hxd.Res.hbomb.toTile();
+        bombImage = new h2d.Bitmap(bombTile, this);
+
+        var btxt = new h2d.Text(font, bombImage);		
+		btxt.textColor = 0x000000;
+        btxt.x = bombImage.getSize ().xMax - 24;        
+        btxt.y = 5;
+        btxt.text = "1";
+
+        var explosionTile = hxd.Res.hexplosion.toTile();
+        explosionImage = new h2d.Bitmap(explosionTile, this);
+        explosionImage.x = bombImage.getBounds ().xMax + spacing;
+
+        var etxt = new h2d.Text(font, explosionImage);		
+		etxt.textColor = 0x000000;
+        etxt.x = explosionImage.getSize ().xMax - 24;        
+        etxt.y = 5;
+        etxt.text = "2";
+
+        var scoreTile = hxd.Res.hscores.toTile();
+        scoreImage = new h2d.Bitmap(scoreTile, this);
+        scoreImage.x = explosionImage.getBounds ().xMax + spacing;
+
+        scoreTxt = new h2d.Text(font, scoreImage);
+		scoreTxt.textColor = 0x000000;
+        scoreTxt.x = scoreImage.getSize ().xMax - 68;        
+        scoreTxt.y = 5;
+        
+        score = 0;
+
+        this.x = 10;
+        this.y = 10;
+        s2d.addChild (this);
+    }
+}
