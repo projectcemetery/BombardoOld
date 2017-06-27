@@ -41,6 +41,22 @@ class Player extends MovingEntity {
         
         s3d.camera.pos.y += dy;
         s3d.camera.target.y += dy;
+
+        if (dx > 0) {
+            model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
+        }
+
+        if (dx < 0) {
+            model.setRotateAxis (0,0, 1, -90 * 3.14 / 180);
+        }
+
+        if (dy < 0) {
+            model.setRotateAxis (0,0, 1, 0);
+        }
+
+        if (dy > 0) {
+            model.setRotateAxis (0,0, 1, 180 * 3.14 / 180);
+        }
     }
 
     /**
@@ -49,7 +65,7 @@ class Player extends MovingEntity {
     function placeBomb () : Void {
         // Place bomb
         placedBomb = entityFactory.recycleBomb ();
-        level.placeEntity (mesh.x, mesh.y, placedBomb);
+        level.placeEntity (model.x, model.y, placedBomb);
         placedBomb.startTimer ();
     }
 
@@ -95,11 +111,14 @@ class Player extends MovingEntity {
     public function new  () {
         super ();
 
-        var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
-        cube.translate (-0.25,-0.25,-0.25);
-        mesh = new h3d.scene.Mesh (cube);
-        mesh.material.color.setColor (0xFF3300);
-        model = mesh;
+        //var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
+        //cube.translate (-0.25,-0.25,-0.25);
+        //mesh = new h3d.scene.Mesh (cube);
+        //mesh.material.color.setColor (0xFF3300);
+        //model = mesh;
+
+        model = modelCache.loadModel(hxd.Res.testchar);
+        model.scale (0.0015);
 
         level.placeEntity (4, 3, this);
         
