@@ -6,8 +6,8 @@ import col.Side;
 import col.CollisionInfo;
 import ent.Entity;
 import ent.StaticEntity;
-import ent.MovingEntity;
 import ent.EntityFactory;
+import prim.CubeSide;
 
 /**
  *  Game level
@@ -30,14 +30,29 @@ class Level {
     var box : h3d.prim.Cube;
 
     /**
-     *  Wall material
+     *  Cube for indestructable wall
      */
-    var wallMat : h3d.mat.MeshMaterial;    
+    var wallCube : prim.PartialCube;
 
     /**
-     *  Floor material
+     *  Cube for floor
      */
-    var floorMat : h3d.mat.MeshMaterial;
+    var floorCube : prim.PartialCube;
+
+    /**
+     *  Material for level
+     */
+    var levelMat : h3d.mat.MeshMaterial;
+
+    /**
+     *  Big primitive for level
+     */
+    var levelPrim : h3d.prim.BigPrimitive;
+
+    /**
+     *  Big mesh for level
+     */
+    var levelMesh : h3d.scene.Mesh;  
 
     /**
      *  Map width
@@ -52,7 +67,7 @@ class Level {
     /**
      *  Map for walls
      */
-    var wallMap : Map<Int, Mesh> = new Map<Int, Mesh> ();
+    var wallMap : Map<Int, Bounds> = new Map<Int, Bounds> ();
 
     /**
      *  Static entities that does not move from cell
@@ -65,10 +80,20 @@ class Level {
     var moveEntities : Array<Entity> = new Array<Entity> ();
 
     /**
+     *  Get linear cell position
+     *  @param x - 
+     *  @param y - 
+     *  @return Int
+     */
+    inline function getPos (x : Int, y : Int) : Int {
+        return y * mapWidth + x;
+    }
+
+    /**
      *  Get mesh wall
      *  @return Mesh
      */
-    function getWall (x : Int, y : Int) : Mesh {
+    function getWall (x : Int, y : Int) : Bounds {
         var pos = y * mapWidth + x;
         return wallMap[pos];
     }
@@ -78,11 +103,10 @@ class Level {
      *  @param x - 
      *  @param y - 
      */
-    function addWall (x : Int, y : Int) {
-        var boxMesh = new h3d.scene.Mesh (box, wallMat, s3d);        
-        boxMesh.setPos (x, y, 0);
-        var pos = y * mapWidth + x;
-        wallMap[pos] = boxMesh;
+    function addWall (x : Int, y : Int) : Void {
+        levelPrim.add (wallCube.buffer, wallCube.idx, x, y);                
+        var pos = getPos (x, y);        
+        wallMap[pos] = Bounds.fromValues (x, y, 0, 1, 1, 1);
     }
 
     /**
@@ -92,8 +116,7 @@ class Level {
      */
 
     function addFloor (x : Int, y : Int) {
-        var boxMesh = new h3d.scene.Mesh (box, floorMat, s3d);
-        boxMesh.setPos (x, y, -1);
+        levelPrim.add (floorCube.buffer, floorCube.idx, x, y);
     }
 
     /**
@@ -129,7 +152,7 @@ class Level {
             for (obj in layer.objects) {
                 
             }
-        }        
+        }
     }
 
     /**
@@ -253,9 +276,8 @@ class Level {
      */
     function isWallCollide (bounds : h3d.col.Bounds, side : Side) : Bool {
 
-        inline function checkCollide (m :Mesh) : Bool {
-            var bou = m.getBounds ();
-            return bounds.collide (bou);
+        inline function checkCollide (m : Bounds) : Bool {
+            return bounds.collide (m);
         }
 
         inline function checkTopLeft () : Bool {            
@@ -323,22 +345,24 @@ class Level {
         s3d = BomberApp.get ().s3d;
         entityFactory = BomberApp.get ().entityFactory;
 
-        box = new h3d.prim.Cube (1.0, 1.0, 1.0);
-        //box.translate (-0.5, -0.5, -0.5);
-        box.addNormals ();
-        box.addUVs ();
+        wallCube = new prim.PartialCube (1, 2);
+        wallCube.full ();
+        wallCube.prepare ();
 
-        var wallTex = hxd.Res.metalbox.toTexture ();
-        wallMat = new h3d.mat.MeshMaterial (wallTex);
-        wallMat.mainPass.enableLights = true;
-        wallMat.shadows = true;
-        
-        var floorTex = hxd.Res.floor.toTexture ();
-        floorMat = new h3d.mat.MeshMaterial (floorTex);
-        floorMat.mainPass.enableLights = true;
-        floorMat.shadows = true;
+        floorCube = new prim.PartialCube (1, 2);
+        floorCube.setSideInfo (CubeSide.STop, 1, true);
+        floorCube.prepare ();
+
+        var levelTex = hxd.Res.level.toTexture ();
+        levelMat = new h3d.mat.MeshMaterial (levelTex);
+        levelMat.mainPass.enableLights = true;
+        levelMat.shadows = true;
+
+        levelPrim = new h3d.prim.BigPrimitive (8);
+        levelMesh = new h3d.scene.Mesh (levelPrim, levelMat, s3d);
 
         createLevel ();
+        
         var mob = entityFactory.recicleMob ();
         placeEntity (6,1, mob);
 
