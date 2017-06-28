@@ -1,6 +1,7 @@
 package ent;
 
 import h3d.col.Point;
+import h3d.col.Bounds;
 import h3d.scene.Object;
 import map.Level;
 import col.CollisionInfo;
@@ -40,6 +41,21 @@ class Entity {
      *  Is entity disposed
      */
     var isDisposed : Bool = false;   
+
+    /**
+     *  Width of bounds
+     */
+    var boundWidth : Float;
+
+    /**
+     *  Height of bounds
+     */
+    var boundHeight : Float;
+
+    /**
+     *  Entity bounds
+     */
+    var bounds : Bounds;
 
     /**
      *  Internal on update
@@ -103,7 +119,7 @@ class Entity {
      */
     function setOnCollision (call : Array<CollisionInfo> -> Void) : Void {
         onCollisionInternal = call;
-    }
+    }    
 
     /**
      *  Constructor
@@ -114,10 +130,13 @@ class Entity {
         modelCache = BomberApp.get ().modelCache;
         level = BomberApp.get ().level;
         entityFactory = BomberApp.get ().entityFactory;
+        boundWidth = 0.8;
+        boundHeight = 0.8;
+        bounds = Bounds.fromValues (0,0,0, boundWidth, boundHeight, 1);
     }
-
+        
     /**
-     *  Model
+     *  Entity model
      */
     public var model (default, null) : Object;
 
@@ -151,6 +170,19 @@ class Entity {
     }
 
     /**
+     *  Get bounds of entity
+     *  @return Bounds
+     */
+    public function getBounds () : Bounds {
+        var pos = model.getAbsPos ();
+        bounds.xMin = pos._41 - boundWidth / 2;
+        bounds.xMax = bounds.xMin + boundWidth;
+        bounds.yMin = pos._42 - boundHeight / 2;
+        bounds.yMax = bounds.yMin + boundHeight;
+        return bounds;
+    }
+
+    /**
      *  On entity hit, by bombs or something else
      */
     public function onHit () : Void {}
@@ -164,7 +196,7 @@ class Entity {
         if ((dx < 0.001 && dx > -0.001) && (dy < 0.001 && dy > -0.001)) return;
 
         var cols = new Array<CollisionInfo> ();        
-        var bounds = model.getBounds ();
+        var bounds = getBounds ();
 
         // RIGHT
         if (dx > 0) {
@@ -225,15 +257,23 @@ class Entity {
                 switch (c.side) {
                     case Side.Top: 
                         model.y += dy;
+                        bounds.yMin += dy;
+                        bounds.yMax += dy;
                         cdy = dy;
                     case Side.Bottom: 
                         model.y += dy;
+                        bounds.yMin += dy;
+                        bounds.yMax += dy;
                         cdy = dy;
                     case Side.Left: 
                         model.x += dx;
+                        bounds.xMin += dx;
+                        bounds.xMax += dx;
                         cdx = dx;
                     case Side.Right: 
                         model.x += dx;
+                        bounds.xMin += dx;
+                        bounds.xMax += dx;
                         cdx = dx;
                     default: {}
                 }

@@ -9,11 +9,6 @@ import col.CollisionInfo;
 class Mob extends Entity {
 
     /**
-     *  Player mesh
-     */
-    var mesh : h3d.scene.Mesh;
-
-    /**
      *  Player speed
      */
     var speed : Float = 0.015;
@@ -22,6 +17,28 @@ class Mob extends Entity {
      *  Direction of moving
      */
     var direction : Side;
+
+    /**
+     *  Move
+     *  @param x - 
+     */
+    function onMoveComplete (dx : Float, dy : Float) : Void {
+        if (dx > 0) {
+            model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
+        }
+
+        if (dx < 0) {
+            model.setRotateAxis (0,0, 1, -90 * 3.14 / 180);
+        }
+
+        if (dy < 0) {
+            model.setRotateAxis (0,0, 1, 0);
+        }
+
+        if (dy > 0) {
+            model.setRotateAxis (0,0, 1, 180 * 3.14 / 180);
+        }
+    }
 
     /**
      *  Generate new direction
@@ -62,15 +79,15 @@ class Mob extends Entity {
      */
     public function new () {
         super ();
+        
+        model = modelCache.loadModel(hxd.Res.Model);
+        model.scale (0.06);
 
-        var cube = new h3d.prim.Cube (0.6, 0.6, 0.6);
-        cube.translate (-0.3,-0.3,-0.3);
-        mesh = new h3d.scene.Mesh (cube);
-        mesh.material.color.setColor (0x1133AF);
-        model = mesh;        
+        model.playAnimation(modelCache.loadAnimation(hxd.Res.Model));
 
         setOnCollision (onCollision);
         setOnUpdate (onUpdate);
+        setOnMoveComplete (onMoveComplete);
         direction = newDirection ();
     }
 

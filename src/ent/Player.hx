@@ -1,5 +1,6 @@
 package ent;
 
+import h3d.col.Bounds;
 import map.Level;
 import col.Side;
 import col.CollisionInfo;
@@ -10,11 +11,6 @@ import ent.EntityFactory;
  *  Player
  */
 class Player extends MovingEntity {
-
-    /**
-     *  Player mesh
-     */
-    var mesh : h3d.scene.Mesh;
 
     /**
      *  Player speed
@@ -110,12 +106,6 @@ class Player extends MovingEntity {
      */
     public function new  () {
         super ();
-
-        //var cube = new h3d.prim.Cube (0.5, 0.5, 0.5);
-        //cube.translate (-0.25,-0.25,-0.25);
-        //mesh = new h3d.scene.Mesh (cube);
-        //mesh.material.color.setColor (0xFF3300);
-        //model = mesh;
 
         model = modelCache.loadModel(hxd.Res.testchar);
         model.scale (0.0015);

@@ -87,7 +87,7 @@ class BomberApp extends hxd.App {
         
         s3d.camera.zNear = 0.01;
         s3d.camera.zFar = 100;
-        s3d.camera.pos.set (4.0, 8.0, 20);
+        s3d.camera.pos.set (4.0, 16.0, 20);
         s3d.camera.target.set (4.0, 3, 0);        
 
         // TODO: background of game level

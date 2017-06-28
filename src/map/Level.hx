@@ -104,7 +104,7 @@ class Level {
      *  @param y - 
      */
     function addWall (x : Int, y : Int) : Void {
-        levelPrim.add (wallCube.buffer, wallCube.idx, x, y);                
+        levelPrim.add (wallCube.buffer, wallCube.idx, x, y);
         var pos = getPos (x, y);        
         wallMap[pos] = Bounds.fromValues (x, y, 0, 1, 1, 1);
     }
