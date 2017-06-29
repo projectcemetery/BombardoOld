@@ -32,11 +32,11 @@ class Player extends MovingEntity {
      *  @param x - 
      */
     function onMoveComplete (dx : Float, dy : Float) : Void {
-        s3d.camera.pos.x += dx;
-        s3d.camera.target.x += dx;
+        ctx.s3d.camera.pos.x += dx;
+        ctx.s3d.camera.target.x += dx;
         
-        s3d.camera.pos.y += dy;
-        s3d.camera.target.y += dy;
+        ctx.s3d.camera.pos.y += dy;
+        ctx.s3d.camera.target.y += dy;
 
         if (dx > 0) {
             model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
@@ -60,8 +60,8 @@ class Player extends MovingEntity {
      */
     function placeBomb () : Void {
         // Place bomb
-        placedBomb = entityFactory.recycleBomb ();
-        level.placeEntity (model.x, model.y, placedBomb);
+        placedBomb = ctx.entityFactory.recycleBomb ();
+        ctx.level.placeEntity (model.x, model.y, placedBomb);
         placedBomb.startTimer ();
     }
 
@@ -105,12 +105,12 @@ class Player extends MovingEntity {
      *  Constructor
      */
     public function new  () {
-        super ();
+        super ();        
 
-        model = modelCache.loadModel(hxd.Res.testchar);
+        model = ctx.modelCache.loadModel(hxd.Res.testchar);
         model.scale (0.0015);
 
-        level.placeEntity (4, 3, this);
+        ctx.level.placeEntity (4, 3, this);
         
         setOnFilterCollision (onFilterCollision);
         setOnMoveComplete (onMoveComplete);
@@ -121,6 +121,6 @@ class Player extends MovingEntity {
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
-        level.removeEntity (this);
+        ctx.level.removeEntity (this);
     }
 }

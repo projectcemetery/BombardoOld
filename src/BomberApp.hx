@@ -4,6 +4,7 @@ import ent.Player;
 import ent.EntityFactory;
 import map.Level;
 import hud.Hud;
+import settings.Settings;
 
 /**
  *  Main app of game
@@ -46,6 +47,11 @@ class BomberApp extends hxd.App {
     public var entityFactory (default, null) : EntityFactory;
 
     /**
+     *  All settings
+     */
+    public var settings (default, null) : Settings;
+
+    /**
      *  Get app
      *  @return BomberApp
      */
@@ -69,18 +75,17 @@ class BomberApp extends hxd.App {
         waitEvent = new hxd.WaitEvent ();
         modelCache = new h3d.prim.ModelCache();
 
+        settings = new Settings ();
         level = new Level ();
         hud = new Hud ();
         entityFactory = new EntityFactory ();
 
+        settings.init ();
         level.init ();
         entityFactory.init ();
         hud.init ();
 
         player = new Player ();
-
-        hud = new Hud ();
-        hud.init ();
 
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
         dir.color.set(0.15, 0.15, 0.15);
@@ -88,7 +93,7 @@ class BomberApp extends hxd.App {
         s3d.camera.zNear = 0.01;
         s3d.camera.zFar = 100;
         s3d.camera.pos.set (4.0, 16.0, 20);
-        s3d.camera.target.set (4.0, 3, 0);        
+        s3d.camera.target.set (4.0, 3, 0);
 
         // TODO: background of game level
         /*var skyTexture = new h3d.mat.Texture(128, 128, [Cube, MipMapped]);

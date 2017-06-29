@@ -80,10 +80,10 @@ class Mob extends Entity {
     public function new () {
         super ();
         
-        model = modelCache.loadModel(hxd.Res.Model);
+        model = ctx.modelCache.loadModel(hxd.Res.Model);
         model.scale (0.06);
 
-        model.playAnimation(modelCache.loadAnimation(hxd.Res.Model));
+        model.playAnimation(ctx.modelCache.loadAnimation(hxd.Res.Model));
 
         setOnCollision (onCollision);
         setOnUpdate (onUpdate);
@@ -96,6 +96,6 @@ class Mob extends Entity {
      */
     override public function onHit () : Void {
         BomberApp.get ().onMobKilled ();
-        level.removeEntity (this);
+        ctx.level.removeEntity (this);
     }
 }

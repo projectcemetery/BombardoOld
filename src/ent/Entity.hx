@@ -13,29 +13,9 @@ import col.Side;
 class Entity {
 
     /**
-     *  Main 3d scene
+     *  Game context
      */
-    var s3d : h3d.scene.Scene;
-
-    /**
-     *  Model cache
-     */
-    var modelCache : h3d.prim.ModelCache;
-
-    /**
-     *  Current game level
-     */
-    var level : Level;    
-
-    /**
-     *  Entity factory
-     */
-    var entityFactory : EntityFactory;
-
-    /**
-     *  For timer
-     */
-    var waitEvent : hxd.WaitEvent;    
+    var ctx : BomberApp;
 
     /**
      *  Is entity disposed
@@ -87,7 +67,7 @@ class Entity {
     function setOnUpdate (val : Float -> Void) : Void {
         if (onUpdateInternal == null) {
             onUpdateInternal = val;
-            waitEvent.waitUntil (function (dt : Float) {
+            ctx.waitEvent.waitUntil (function (dt : Float) {
                 if (isDisposed) return true;
                 onUpdateInternal (dt);
                 return false;
@@ -125,11 +105,7 @@ class Entity {
      *  Constructor
      */
     public function new () {
-        waitEvent = BomberApp.get ().waitEvent;
-        s3d = BomberApp.get ().s3d;
-        modelCache = BomberApp.get ().modelCache;
-        level = BomberApp.get ().level;
-        entityFactory = BomberApp.get ().entityFactory;
+        ctx = BomberApp.get ();
         boundWidth = 0.8;
         boundHeight = 0.8;
         bounds = Bounds.fromValues (0,0,0, boundWidth, boundHeight, 1);
@@ -241,7 +217,7 @@ class Entity {
             });
         }
 
-        cols = level.isCollide (cols);        
+        cols = ctx.level.isCollide (cols);        
 
         var cdx = 0.0;
         var cdy = 0.0;

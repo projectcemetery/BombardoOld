@@ -158,15 +158,15 @@ BomberApp.prototype = $extend(hxd_App.prototype,{
 		BomberApp.instance = this;
 		this.waitEvent = new hxd_WaitEvent();
 		this.modelCache = new h3d_prim_ModelCache();
+		this.settings = new settings_Settings();
 		this.level = new map_Level();
 		this.hud = new hud_Hud();
 		this.entityFactory = new ent_EntityFactory();
+		this.settings.init();
 		this.level.init();
 		this.entityFactory.init();
 		this.hud.init();
 		this.player = new ent_Player();
-		this.hud = new hud_Hud();
-		this.hud.init();
 		var dir = new h3d_scene_DirLight(new h3d_Vector(0.2,0.3,-1),this.s3d);
 		var _this = dir.get_color();
 		_this.x = 0.15;
@@ -781,11 +781,7 @@ col_Side.Left.__enum__ = col_Side;
 col_Side.__empty_constructs__ = [col_Side.Top,col_Side.Right,col_Side.Bottom,col_Side.Left];
 var ent_Entity = function() {
 	this.isDisposed = false;
-	this.waitEvent = BomberApp.instance.waitEvent;
-	this.s3d = BomberApp.instance.s3d;
-	this.modelCache = BomberApp.instance.modelCache;
-	this.level = BomberApp.instance.level;
-	this.entityFactory = BomberApp.instance.entityFactory;
+	this.ctx = BomberApp.instance;
 	this.boundWidth = 0.8;
 	this.boundHeight = 0.8;
 	var dx = this.boundWidth;
@@ -806,7 +802,7 @@ ent_Entity.prototype = {
 		var _gthis = this;
 		if(this.onUpdateInternal == null) {
 			this.onUpdateInternal = val;
-			this.waitEvent.waitUntil(function(dt) {
+			this.ctx.waitEvent.waitUntil(function(dt) {
 				if(_gthis.isDisposed) {
 					return true;
 				}
@@ -916,7 +912,7 @@ ent_Entity.prototype = {
 			b7.yMin += dy;
 			cols.push({ entity1 : this, side : col_Side.Top, bounds : b7});
 		}
-		cols = this.level.isCollide(cols);
+		cols = this.ctx.level.isCollide(cols);
 		var cdx = 0.0;
 		var cdy = 0.0;
 		var colCompl = [];
@@ -1018,7 +1014,7 @@ ent_StaticEntity.prototype = $extend(ent_Entity.prototype,{
 var ent_Bomb = function(bombSettings) {
 	ent_StaticEntity.call(this);
 	this.bombSettings = bombSettings;
-	this.model = this.modelCache.loadModel(hxd_Res.get_loader().loadModel("bomb.fbx"));
+	this.model = this.ctx.modelCache.loadModel(hxd_Res.get_loader().loadModel("bomb.fbx"));
 	this.model.rotate(0.3,0.0,0.0);
 	var _this = this.model;
 	var _g = _this;
@@ -1065,22 +1061,22 @@ ent_Bomb.__super__ = ent_StaticEntity;
 ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 	startTimer: function() {
 		var _gthis = this;
-		this.waitEvent.wait(this.bombSettings.lifetime,function() {
+		this.ctx.waitEvent.wait(this.bombSettings.lifetime,function() {
 			var wallLeft = false;
 			var wallRight = false;
 			var wallTop = false;
 			var wallBottom = false;
 			var pos = _gthis.getPos();
-			var mapPos = _gthis.level.getMapPos(pos.x,pos.y);
+			var mapPos = _gthis.ctx.level.getMapPos(pos.x,pos.y);
 			var px = mapPos.x;
 			var py = mapPos.y;
-			if(!_gthis.level.isWall(px,py)) {
-				var entity = _gthis.level.getEntity(px,py);
+			if(!_gthis.ctx.level.isWall(px,py)) {
+				var entity = _gthis.ctx.level.getEntity(px,py);
 				if(entity != null) {
 					entity.onHit();
 				}
-				var expl = _gthis.entityFactory.recycleExplosion();
-				_gthis.level.placeEntity(px,py,expl);
+				var expl = _gthis.ctx.entityFactory.recycleExplosion();
+				_gthis.ctx.level.placeEntity(px,py,expl);
 				expl.startTimer();
 			}
 			var _g1 = 0;
@@ -1090,15 +1086,15 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 				var x = mapPos.x + (i + 1);
 				var y = mapPos.y;
 				if(!wallRight) {
-					if(_gthis.level.isWall(x,y)) {
+					if(_gthis.ctx.level.isWall(x,y)) {
 						wallRight = true;
 					} else {
-						var entity1 = _gthis.level.getEntity(x,y);
+						var entity1 = _gthis.ctx.level.getEntity(x,y);
 						if(entity1 != null) {
 							entity1.onHit();
 						}
-						var expl1 = _gthis.entityFactory.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl1);
+						var expl1 = _gthis.ctx.entityFactory.recycleExplosion();
+						_gthis.ctx.level.placeEntity(x,y,expl1);
 						expl1.startTimer();
 						wallRight = false;
 					}
@@ -1106,15 +1102,15 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 				x = mapPos.x - (i + 1);
 				y = mapPos.y;
 				if(!wallLeft) {
-					if(_gthis.level.isWall(x,y)) {
+					if(_gthis.ctx.level.isWall(x,y)) {
 						wallLeft = true;
 					} else {
-						var entity2 = _gthis.level.getEntity(x,y);
+						var entity2 = _gthis.ctx.level.getEntity(x,y);
 						if(entity2 != null) {
 							entity2.onHit();
 						}
-						var expl2 = _gthis.entityFactory.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl2);
+						var expl2 = _gthis.ctx.entityFactory.recycleExplosion();
+						_gthis.ctx.level.placeEntity(x,y,expl2);
 						expl2.startTimer();
 						wallLeft = false;
 					}
@@ -1122,15 +1118,15 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 				x = mapPos.x;
 				y = mapPos.y + (i + 1);
 				if(!wallBottom) {
-					if(_gthis.level.isWall(x,y)) {
+					if(_gthis.ctx.level.isWall(x,y)) {
 						wallBottom = true;
 					} else {
-						var entity3 = _gthis.level.getEntity(x,y);
+						var entity3 = _gthis.ctx.level.getEntity(x,y);
 						if(entity3 != null) {
 							entity3.onHit();
 						}
-						var expl3 = _gthis.entityFactory.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl3);
+						var expl3 = _gthis.ctx.entityFactory.recycleExplosion();
+						_gthis.ctx.level.placeEntity(x,y,expl3);
 						expl3.startTimer();
 						wallBottom = false;
 					}
@@ -1138,21 +1134,21 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 				x = mapPos.x;
 				y = mapPos.y - (i + 1);
 				if(!wallTop) {
-					if(_gthis.level.isWall(x,y)) {
+					if(_gthis.ctx.level.isWall(x,y)) {
 						wallTop = true;
 					} else {
-						var entity4 = _gthis.level.getEntity(x,y);
+						var entity4 = _gthis.ctx.level.getEntity(x,y);
 						if(entity4 != null) {
 							entity4.onHit();
 						}
-						var expl4 = _gthis.entityFactory.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl4);
+						var expl4 = _gthis.ctx.entityFactory.recycleExplosion();
+						_gthis.ctx.level.placeEntity(x,y,expl4);
 						expl4.startTimer();
 						wallTop = false;
 					}
 				}
 			}
-			_gthis.level.removeEntity(_gthis);
+			_gthis.ctx.level.removeEntity(_gthis);
 		});
 	}
 	,__class__: ent_Bomb
@@ -1197,8 +1193,8 @@ ent_Explosion.__super__ = ent_StaticEntity;
 ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
 	startTimer: function() {
 		var _gthis = this;
-		this.waitEvent.wait(this.explosionSettings.lifetime,function() {
-			_gthis.level.removeEntity(_gthis);
+		this.ctx.waitEvent.wait(this.explosionSettings.lifetime,function() {
+			_gthis.ctx.level.removeEntity(_gthis);
 		});
 	}
 	,__class__: ent_Explosion
@@ -1206,7 +1202,7 @@ ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
 var ent_Mob = function() {
 	this.speed = 0.015;
 	ent_Entity.call(this);
-	this.model = this.modelCache.loadModel(hxd_Res.get_loader().loadModel("Model.FBX"));
+	this.model = this.ctx.modelCache.loadModel(hxd_Res.get_loader().loadModel("Model.FBX"));
 	var _this = this.model;
 	var _g = _this;
 	var v = _g.scaleX * 0.06;
@@ -1245,7 +1241,7 @@ var ent_Mob = function() {
 	} else {
 		_this.flags &= ~f3;
 	}
-	this.model.playAnimation(this.modelCache.loadAnimation(hxd_Res.get_loader().loadModel("Model.FBX")));
+	this.model.playAnimation(this.ctx.modelCache.loadAnimation(hxd_Res.get_loader().loadModel("Model.FBX")));
 	this.setOnCollision($bind(this,this.onCollision));
 	this.setOnUpdate($bind(this,this.onUpdate));
 	this.setOnMoveComplete($bind(this,this.onMoveComplete));
@@ -1300,7 +1296,7 @@ ent_Mob.prototype = $extend(ent_Entity.prototype,{
 	}
 	,onHit: function() {
 		BomberApp.instance.onMobKilled();
-		this.level.removeEntity(this);
+		this.ctx.level.removeEntity(this);
 	}
 	,__class__: ent_Mob
 });
@@ -1318,7 +1314,7 @@ var ent_Player = function() {
 	this.placedBomb = null;
 	this.speed = 0.03;
 	ent_MovingEntity.call(this);
-	this.model = this.modelCache.loadModel(hxd_Res.get_loader().loadModel("testchar.fbx"));
+	this.model = this.ctx.modelCache.loadModel(hxd_Res.get_loader().loadModel("testchar.fbx"));
 	var _this = this.model;
 	var _g = _this;
 	var v = _g.scaleX * 0.0015;
@@ -1357,7 +1353,7 @@ var ent_Player = function() {
 	} else {
 		_this.flags &= ~f3;
 	}
-	this.level.placeEntity(4,3,this);
+	this.ctx.level.placeEntity(4,3,this);
 	this.setOnFilterCollision($bind(this,this.onFilterCollision));
 	this.setOnMoveComplete($bind(this,this.onMoveComplete));
 	this.setOnUpdate($bind(this,this.onUpdate));
@@ -1367,10 +1363,10 @@ ent_Player.__name__ = ["ent","Player"];
 ent_Player.__super__ = ent_MovingEntity;
 ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 	onMoveComplete: function(dx,dy) {
-		this.s3d.camera.pos.x += dx;
-		this.s3d.camera.target.x += dx;
-		this.s3d.camera.pos.y += dy;
-		this.s3d.camera.target.y += dy;
+		this.ctx.s3d.camera.pos.x += dx;
+		this.ctx.s3d.camera.target.x += dx;
+		this.ctx.s3d.camera.pos.y += dy;
+		this.ctx.s3d.camera.target.y += dy;
 		if(dx > 0) {
 			this.model.setRotateAxis(0,0,1,1.57);
 		}
@@ -1385,8 +1381,8 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		}
 	}
 	,placeBomb: function() {
-		this.placedBomb = this.entityFactory.recycleBomb();
-		this.level.placeEntity(this.model.x,this.model.y,this.placedBomb);
+		this.placedBomb = this.ctx.entityFactory.recycleBomb();
+		this.ctx.level.placeEntity(this.model.x,this.model.y,this.placedBomb);
 		this.placedBomb.startTimer();
 	}
 	,onFilterCollision: function(c) {
@@ -1424,7 +1420,7 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		}
 	}
 	,onHit: function() {
-		this.level.removeEntity(this);
+		this.ctx.level.removeEntity(this);
 	}
 	,__class__: ent_Player
 });
@@ -31753,7 +31749,7 @@ hud_Hud.prototype = $extend(h2d_Sprite.prototype,{
 		return v;
 	}
 	,init: function() {
-		this.s2d = BomberApp.instance.s2d;
+		this.ctx = BomberApp.instance;
 		var font = hxd_Res.get_loader().loadFont("trueTypeFont.ttf").build(24);
 		var bombTile = hxd_Res.get_loader().loadImage("hbomb.png").toTile();
 		this.bombImage = new h2d_Bitmap(bombTile,this);
@@ -31764,13 +31760,14 @@ hud_Hud.prototype = $extend(h2d_Sprite.prototype,{
 		btxt.x = v;
 		btxt.posChanged = true;
 		btxt.y = 5;
-		btxt.set_text("1");
+		var _this = this.ctx.settings.player;
+		btxt.set_text(Std.string(1));
 		var explosionTile = hxd_Res.get_loader().loadImage("hexplosion.png").toTile();
 		this.explosionImage = new h2d_Bitmap(explosionTile,this);
-		var _this = this.explosionImage;
+		var _this1 = this.explosionImage;
 		var v1 = this.bombImage.getBounds().xMax + this.spacing;
-		_this.posChanged = true;
-		_this.x = v1;
+		_this1.posChanged = true;
+		_this1.x = v1;
 		var etxt = new h2d_Text(font,this.explosionImage);
 		etxt.set_textColor(0);
 		var v2 = this.explosionImage.getSize().xMax - 24;
@@ -31781,25 +31778,25 @@ hud_Hud.prototype = $extend(h2d_Sprite.prototype,{
 		etxt.set_text("2");
 		var scoreTile = hxd_Res.get_loader().loadImage("hscores.png").toTile();
 		this.scoreImage = new h2d_Bitmap(scoreTile,this);
-		var _this1 = this.scoreImage;
+		var _this2 = this.scoreImage;
 		var v3 = this.explosionImage.getBounds().xMax + this.spacing;
-		_this1.posChanged = true;
-		_this1.x = v3;
+		_this2.posChanged = true;
+		_this2.x = v3;
 		this.scoreTxt = new h2d_Text(font,this.scoreImage);
 		this.scoreTxt.set_textColor(0);
-		var _this2 = this.scoreTxt;
-		var v4 = this.scoreImage.getSize().xMax - 68;
-		_this2.posChanged = true;
-		_this2.x = v4;
 		var _this3 = this.scoreTxt;
+		var v4 = this.scoreImage.getSize().xMax - 68;
 		_this3.posChanged = true;
-		_this3.y = 5;
+		_this3.x = v4;
+		var _this4 = this.scoreTxt;
+		_this4.posChanged = true;
+		_this4.y = 5;
 		this.set_score(0);
 		this.posChanged = true;
 		this.x = 10;
 		this.posChanged = true;
 		this.y = 10;
-		this.s2d.addChild(this);
+		this.ctx.s2d.addChild(this);
 	}
 	,__class__: hud_Hud
 });
@@ -50437,6 +50434,51 @@ prim_PartialCube.prototype = {
 		}
 	}
 	,__class__: prim_PartialCube
+};
+var settings_ChangeNotifier = function() {
+	this.handlers = [];
+};
+$hxClasses["settings.ChangeNotifier"] = settings_ChangeNotifier;
+settings_ChangeNotifier.__name__ = ["settings","ChangeNotifier"];
+settings_ChangeNotifier.prototype = {
+	notify: function(name,value) {
+		var _g = 0;
+		var _g1 = this.handlers;
+		while(_g < _g1.length) {
+			var h = _g1[_g];
+			++_g;
+			h(name,value);
+		}
+	}
+	,addHandler: function(call) {
+		this.handlers.push(call);
+	}
+	,removeHandler: function(call) {
+		HxOverrides.remove(this.handlers,call);
+	}
+	,__class__: settings_ChangeNotifier
+};
+var settings_PlayerSettings = function() {
+	settings_ChangeNotifier.call(this);
+};
+$hxClasses["settings.PlayerSettings"] = settings_PlayerSettings;
+settings_PlayerSettings.__name__ = ["settings","PlayerSettings"];
+settings_PlayerSettings.__super__ = settings_ChangeNotifier;
+settings_PlayerSettings.prototype = $extend(settings_ChangeNotifier.prototype,{
+	getMaxBombCount: function() {
+		return 1;
+	}
+	,__class__: settings_PlayerSettings
+});
+var settings_Settings = function() {
+};
+$hxClasses["settings.Settings"] = settings_Settings;
+settings_Settings.__name__ = ["settings","Settings"];
+settings_Settings.prototype = {
+	init: function() {
+		this.player = new settings_PlayerSettings();
+	}
+	,__class__: settings_Settings
 };
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;

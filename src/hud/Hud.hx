@@ -8,9 +8,9 @@ import h2d.Font;
 class Hud extends Sprite {
 
     /**
-     *  2d scene
+     *  Game context
      */
-    var s2d : Scene;
+    var ctx : BomberApp;
 
     /**
      *  Space between items
@@ -81,7 +81,7 @@ class Hud extends Sprite {
      *  On post create
      */
     public function init () {
-        s2d = BomberApp.get ().s2d;
+        ctx = BomberApp.get ();
 
         var font = hxd.Res.trueTypeFont.build(24);
         
@@ -92,7 +92,7 @@ class Hud extends Sprite {
 		btxt.textColor = 0x000000;
         btxt.x = bombImage.getSize ().xMax - 24;        
         btxt.y = 5;
-        btxt.text = "1";
+        btxt.text = Std.string (ctx.settings.player.getMaxBombCount ());
 
         var explosionTile = hxd.Res.hexplosion.toTile();
         explosionImage = new h2d.Bitmap(explosionTile, this);
@@ -117,6 +117,6 @@ class Hud extends Sprite {
 
         this.x = 10;
         this.y = 10;
-        s2d.addChild (this);
+        ctx.s2d.addChild (this);
     }
 }

@@ -20,7 +20,7 @@ class Bomb extends StaticEntity {
         super ();
         this.bombSettings = bombSettings;        
         
-        model = modelCache.loadModel(hxd.Res.bomb);
+        model = ctx.modelCache.loadModel(hxd.Res.bomb);
         model.rotate (0.3, 0.0, 0.0);        
         model.scale (0.003);
     }
@@ -29,7 +29,7 @@ class Bomb extends StaticEntity {
      *  Start bomb timer
      */
     public function startTimer () : Void {
-        waitEvent.wait (bombSettings.lifetime, function () {
+        ctx.waitEvent.wait (bombSettings.lifetime, function () {
             var wallLeft = false;
             var wallRight = false;
             var wallTop = false;
@@ -37,17 +37,17 @@ class Bomb extends StaticEntity {
 
             // If wall on the way then returns true
             inline function process (px : Int, py : Int) : Bool {
-                if (level.isWall (px, py)) return true;
-                var entity = level.getEntity (px, py);                
+                if (ctx.level.isWall (px, py)) return true;
+                var entity = ctx.level.getEntity (px, py);                
                 if (entity != null) entity.onHit ();
-                var expl = entityFactory.recycleExplosion ();
-                level.placeEntity (px, py, expl);
+                var expl = ctx.entityFactory.recycleExplosion ();
+                ctx.level.placeEntity (px, py, expl);
                 expl.startTimer ();
                 return false;
             }
 
             var pos = getPos ();
-            var mapPos = level.getMapPos (pos.x, pos.y);
+            var mapPos = ctx.level.getMapPos (pos.x, pos.y);
             process (mapPos.x, mapPos.y);
             for (i in 0...bombSettings.length - 1) {
                 var x = mapPos.x + (i + 1);
@@ -67,7 +67,7 @@ class Bomb extends StaticEntity {
                 if (!wallTop) wallTop = process (x, y);
             }
 
-            level.removeEntity (this);
+            ctx.level.removeEntity (this);
         });
     }
 }

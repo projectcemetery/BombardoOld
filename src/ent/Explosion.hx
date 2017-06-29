@@ -35,8 +35,8 @@ class Explosion extends StaticEntity {
      *  Start work
      */
     public function startTimer () : Void {
-        waitEvent.wait (explosionSettings.lifetime, function () {
-            level.removeEntity (this);
+        ctx.waitEvent.wait (explosionSettings.lifetime, function () {
+            ctx.level.removeEntity (this);
         });
     }
 }
