@@ -27,6 +27,11 @@ class BomberApp extends hxd.App {
     public var waitEvent (default, null) : hxd.WaitEvent;
 
     /**
+     *  Event dispatcher
+     */
+    public var dispatcher (default, null) : dispatch.Dispatcher;
+
+    /**
      *  Player mesh
      */
     var player : Player;
@@ -63,7 +68,7 @@ class BomberApp extends hxd.App {
      *  Notify that mob was killed
      */
     public function onMobKilled () : Void {
-        hud.score += 5;
+        settings.player.score += 5;
     }
 
     /**
@@ -75,6 +80,7 @@ class BomberApp extends hxd.App {
         waitEvent = new hxd.WaitEvent ();
         modelCache = new h3d.prim.ModelCache();
 
+        dispatcher = dispatch.Dispatcher.get ();
         settings = new Settings ();
         level = new Level ();
         hud = new Hud ();

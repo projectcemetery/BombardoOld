@@ -44,30 +44,14 @@ class Hud extends Sprite {
     function set_bombCount (v : Int) : Int {
         return 0;
     }
-    
-    /**
-     *  Player score
-     */
-    var scoreInternal : Int;    
-    public var score (get, set) : Int;    
-
-    /**
-     *  Get player score
-     *  @return Int
-     */
-    function get_score () : Int {
-        return scoreInternal;
-    }
-
+        
     /**
      *  Set player score
      *  @param v - 
      *  @return Int
      */
-    function set_score (v : Int) : Int {
-        scoreInternal = v;
+    function setScore (v : Int) : Void {
         scoreTxt.text = Std.string (v);
-        return v;
     }
 
     /**
@@ -92,7 +76,7 @@ class Hud extends Sprite {
 		btxt.textColor = 0x000000;
         btxt.x = bombImage.getSize ().xMax - 24;        
         btxt.y = 5;
-        btxt.text = Std.string (ctx.settings.player.getMaxBombCount ());
+        btxt.text = Std.string (ctx.settings.player.maxBombCount);
 
         var explosionTile = hxd.Res.hexplosion.toTile();
         explosionImage = new h2d.Bitmap(explosionTile, this);
@@ -113,10 +97,14 @@ class Hud extends Sprite {
         scoreTxt.x = scoreImage.getSize ().xMax - 68;        
         scoreTxt.y = 5;
         
-        score = 0;
+        setScore (ctx.settings.player.score);
 
         this.x = 10;
         this.y = 10;
         ctx.s2d.addChild (this);
+
+        ctx.dispatcher.addHandler (settings.PlayerSettings.SCORE, function (e) {
+            setScore (e);
+        });
     }
 }

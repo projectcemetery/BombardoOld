@@ -21,6 +21,6 @@ class Settings {
      */
     public function init () : Void {
         // TODO read from somethere. Tarantool???
-        player = new PlayerSettings ();        
+        player = new PlayerSettings ();
     }
 }
