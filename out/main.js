@@ -31803,6 +31803,7 @@ haxe_zip_Uncompress.run = function(src,bufsize) {
 	return haxe_zip_InflateImpl.run(new haxe_io_BytesInput(src),bufsize);
 };
 var hud_Hud = function() {
+	this.isDebug = false;
 	this.spacing = 10;
 	h2d_Sprite.call(this);
 };
@@ -31815,6 +31816,49 @@ hud_Hud.prototype = $extend(h2d_Sprite.prototype,{
 	}
 	,setScore: function(v) {
 		this.scoreTxt.set_text(v == null ? "null" : "" + v);
+	}
+	,showDebug: function() {
+		if(this.isDebug) {
+			return;
+		}
+		var font = hxd_Res.get_loader().loadFont("trueTypeFont.ttf").build(16);
+		this.drawCallTxt = new h2d_Text(font,this.ctx.s2d);
+		this.drawCallTxt.set_textColor(16777215);
+		var _this = this.drawCallTxt;
+		_this.posChanged = true;
+		_this.x = this.ctx.s2d.width - 200;
+		var _this1 = this.drawCallTxt;
+		_this1.posChanged = true;
+		_this1.y = 10;
+		this.drawCallTxt.set_text("");
+		this.triangleTxt = new h2d_Text(font,this.ctx.s2d);
+		this.triangleTxt.set_textColor(16777215);
+		var _this2 = this.triangleTxt;
+		_this2.posChanged = true;
+		_this2.x = this.ctx.s2d.width - 200;
+		var _this3 = this.triangleTxt;
+		_this3.posChanged = true;
+		_this3.y = 30;
+		this.fpsTxt = new h2d_Text(font,this.ctx.s2d);
+		this.fpsTxt.set_textColor(16777215);
+		var _this4 = this.fpsTxt;
+		_this4.posChanged = true;
+		_this4.x = this.ctx.s2d.width - 200;
+		var _this5 = this.fpsTxt;
+		_this5.posChanged = true;
+		_this5.y = 50;
+		this.isDebug = true;
+	}
+	,onUpdate: function(dt) {
+		if(hxd_Key.isPressed(120)) {
+			this.showDebug();
+		}
+		if(this.isDebug) {
+			this.drawCallTxt.set_text("DRAW CALLS: " + this.ctx.engine.drawCalls);
+			this.triangleTxt.set_text("TRIANGLES: " + this.ctx.engine.drawTriangles);
+			this.fpsTxt.set_text("FPS: " + this.ctx.engine.get_fps());
+		}
+		return false;
 	}
 	,init: function() {
 		var _gthis = this;
@@ -31868,6 +31912,7 @@ hud_Hud.prototype = $extend(h2d_Sprite.prototype,{
 		this.ctx.dispatcher.addHandler("settings.PlayerSettings.score",function(e) {
 			_gthis.setScore(e);
 		});
+		this.ctx.waitEvent.waitUntil($bind(this,this.onUpdate));
 	}
 	,__class__: hud_Hud
 });

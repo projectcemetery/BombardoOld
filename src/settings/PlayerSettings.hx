@@ -4,7 +4,6 @@ import dispatch.ChangeNotifier;
 
 /**
  *  Settings for player
- *  TODO macros
  */
 class PlayerSettings extends ChangeNotifier {
 

@@ -44,6 +44,26 @@ class Hud extends Sprite {
     function set_bombCount (v : Int) : Int {
         return 0;
     }
+
+    /**
+     *  Draw call text
+     */
+    var drawCallTxt : h2d.Text;
+
+    /**
+     *  Triangle count
+     */
+    var triangleTxt : h2d.Text;
+
+    /**
+     *  FPS
+     */
+    var fpsTxt : h2d.Text;
+
+    /**
+     *  Is debug
+     */
+    var isDebug : Bool = false;
         
     /**
      *  Set player score
@@ -52,6 +72,49 @@ class Hud extends Sprite {
      */
     function setScore (v : Int) : Void {
         scoreTxt.text = Std.string (v);
+    }
+
+    /**
+     *  Show debug info
+     */
+    function showDebug () {
+        if (isDebug) return;
+        var font = hxd.Res.trueTypeFont.build(16);
+        drawCallTxt = new h2d.Text(font, ctx.s2d);		
+		drawCallTxt.textColor = 0xFFFFFF;
+        drawCallTxt.x = ctx.s2d.width - 200;
+        drawCallTxt.y = 10;
+        drawCallTxt.text = "";
+        
+        triangleTxt = new h2d.Text(font, ctx.s2d);		
+		triangleTxt.textColor = 0xFFFFFF;
+        triangleTxt.x = ctx.s2d.width - 200;
+        triangleTxt.y = 30;
+
+        fpsTxt = new h2d.Text(font, ctx.s2d);		
+		fpsTxt.textColor = 0xFFFFFF;
+        fpsTxt.x = ctx.s2d.width - 200;
+        fpsTxt.y = 50;
+
+        isDebug = true;
+    }
+
+    /**
+     *  On player logic update
+     *  @param dt - 
+     */
+    function onUpdate (dt : Float) : Bool {
+        if (hxd.Key.isPressed (hxd.Key.F9)) {
+            showDebug ();
+        }
+
+        if (isDebug) {
+            drawCallTxt.text = 'DRAW CALLS: ${ctx.engine.drawCalls}';
+            triangleTxt.text = 'TRIANGLES: ${ctx.engine.drawTriangles}';
+            fpsTxt.text = 'FPS: ${ctx.engine.fps}';
+        }
+
+        return false;
     }
 
     /**
@@ -101,10 +164,12 @@ class Hud extends Sprite {
 
         this.x = 10;
         this.y = 10;
-        ctx.s2d.addChild (this);
+        ctx.s2d.addChild (this);        
 
         ctx.dispatcher.addHandler (settings.PlayerSettings.SCORE, function (e) {
             setScore (e);
         });
-    }
+
+        ctx.waitEvent.waitUntil (onUpdate);
+    }    
 }
