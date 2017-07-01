@@ -1,7 +1,5 @@
 package ent;
 
-import map.Level;
-
 /**
  *  Explosion from bomb
  */
@@ -28,7 +26,8 @@ class Explosion extends StaticEntity {
         cube.translate (-0.25,-0.25,-0.25);
         mesh = new h3d.scene.Mesh (cube);
         mesh.material.color.setColor (0xFF3355);
-        model = mesh;        
+        model = mesh;
+        isObstacle = false;
     }
 
     /**

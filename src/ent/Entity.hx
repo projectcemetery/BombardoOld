@@ -3,7 +3,6 @@ package ent;
 import h3d.col.Point;
 import h3d.col.Bounds;
 import h3d.scene.Object;
-import map.Level;
 import col.CollisionInfo;
 import col.Side;
 
@@ -60,6 +59,11 @@ class Entity {
     var onCollisionInternal : Array<CollisionInfo> -> Void;
 
     /**
+     *  If true, then entity can't go through it
+     */
+    public var isObstacle (default, null) : Bool;
+
+    /**
      *  Set on update
      *  @param val - 
      *  @return Float -> Void
@@ -109,6 +113,7 @@ class Entity {
         boundWidth = 0.8;
         boundHeight = 0.8;
         bounds = Bounds.fromValues (0,0,0, boundWidth, boundHeight, 1);
+        isObstacle = true;
     }
         
     /**
@@ -167,6 +172,7 @@ class Entity {
      *  Move entity with checking collisions
      *  @param dx - 
      *  @param dy - 
+     *  TODO: refactor this
      */
     function move (dx : Float, dy : Float) : Void {
         if ((dx < 0.001 && dx > -0.001) && (dy < 0.001 && dy > -0.001)) return;
@@ -229,7 +235,8 @@ class Entity {
                 if (onFilterCollisionInternal (c)) c.isCollide = false;
             }
 
-            if (!c.isCollide) {
+            // If no collision or entity is not obstacle
+            if (!c.isCollide || (c.entity2 != null && !c.entity2.isObstacle)) {
                 switch (c.side) {
                     case Side.Top: 
                         model.y += dy;

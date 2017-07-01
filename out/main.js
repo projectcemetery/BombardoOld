@@ -846,6 +846,7 @@ var ent_Entity = function() {
 	b.yMax = dy;
 	b.zMax = 1;
 	this.bounds = b;
+	this.isObstacle = true;
 };
 $hxClasses["ent.Entity"] = ent_Entity;
 ent_Entity.__name__ = ["ent","Entity"];
@@ -977,7 +978,7 @@ ent_Entity.prototype = {
 					c.isCollide = false;
 				}
 			}
-			if(!c.isCollide) {
+			if(!c.isCollide || c.entity2 != null && !c.entity2.isObstacle) {
 				var _g1 = c.side;
 				switch(_g1[1]) {
 				case 0:
@@ -1238,6 +1239,7 @@ var ent_Explosion = function(explosionSettings) {
 	_this.z = 0.333333333333333315;
 	_this.w = 0.;
 	this.model = this.mesh;
+	this.isObstacle = false;
 };
 $hxClasses["ent.Explosion"] = ent_Explosion;
 ent_Explosion.__name__ = ["ent","Explosion"];
