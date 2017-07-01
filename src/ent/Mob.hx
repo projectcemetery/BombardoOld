@@ -54,9 +54,17 @@ class Mob extends Entity {
      *  @param cols - 
      */
     function onCollision (cols : Array<CollisionInfo>) : Void {        
-        if (cols.length > 0) {
-            //trace  (Std.is (cols[0].entity1, Mob));
-            direction = newDirection ();
+        if (cols.length > 0) {            
+            var play : Entity = null;
+            for (c in cols) {
+                if (Std.is(c.entity1, Player)) play = c.entity1;
+                if (Std.is(c.entity2, Player)) play = c.entity2;
+            }
+            if (play != null) {
+                play.onHit ();
+            } else {
+                direction = newDirection ();
+            }
         }
     }
 

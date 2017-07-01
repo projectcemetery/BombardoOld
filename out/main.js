@@ -978,6 +978,9 @@ ent_Entity.prototype = {
 					c.isCollide = false;
 				}
 			}
+			if(c.entity2 != null && c.entity2.onCollisionInternal != null) {
+				c.entity2.onCollisionInternal([c]);
+			}
 			if(!c.isCollide || c.entity2 != null && !c.entity2.isObstacle) {
 				var _g1 = c.side;
 				switch(_g1[1]) {
@@ -1328,7 +1331,23 @@ ent_Mob.prototype = $extend(ent_Entity.prototype,{
 	}
 	,onCollision: function(cols) {
 		if(cols.length > 0) {
-			this.direction = this.newDirection();
+			var play = null;
+			var _g = 0;
+			while(_g < cols.length) {
+				var c = cols[_g];
+				++_g;
+				if(js_Boot.__instanceof(c.entity1,ent_Player)) {
+					play = c.entity1;
+				}
+				if(js_Boot.__instanceof(c.entity2,ent_Player)) {
+					play = c.entity2;
+				}
+			}
+			if(play != null) {
+				play.onHit();
+			} else {
+				this.direction = this.newDirection();
+			}
 		}
 	}
 	,onUpdate: function(dt) {

@@ -235,6 +235,8 @@ class Entity {
                 if (onFilterCollisionInternal (c)) c.isCollide = false;
             }
 
+            if (c.entity2 != null && c.entity2.onCollisionInternal != null) c.entity2.onCollisionInternal ([c]);
+
             // If no collision or entity is not obstacle
             if (!c.isCollide || (c.entity2 != null && !c.entity2.isObstacle)) {
                 switch (c.side) {
@@ -263,7 +265,7 @@ class Entity {
             } else {
                 colCompl.push (c);
             }
-        }
+        }        
 
         if (onCollisionInternal != null) onCollisionInternal (colCompl);
         if (onMoveCompleteInternal != null) onMoveCompleteInternal (cdx, cdy);
