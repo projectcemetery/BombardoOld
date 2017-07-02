@@ -18,6 +18,11 @@ class Player extends MovingEntity {
     var speed : Float = 0.03;
 
     /**
+     *  Placed bomb count
+     */
+    var placedCount : Int = 0;
+
+    /**
      *  Placed bomb
      */
     var placedBomb : Bomb = null;
@@ -59,9 +64,15 @@ class Player extends MovingEntity {
      *  Place bomb
      */
     function placeBomb () : Void {
+        if (placedCount >= ctx.settings.player.maxBombCount) return;
+
+        placedCount += 1;
         // Place bomb
         placedBomb = ctx.entityFactory.recycleBomb ();
         ctx.level.placeEntity (model.x, model.y, placedBomb);
+        placedBomb.onBoom = function () {
+            placedCount -= 1;
+        };
         placedBomb.startTimer ();
     }
 

@@ -14,6 +14,11 @@ class Bomb extends StaticEntity {
     var bombSettings : BombSettings;
 
     /**
+     *  Call back on boom
+     */
+    public var onBoom : Void -> Void;
+
+    /**
      *  Constructor
      */
     public function new (bombSettings : BombSettings) {
@@ -67,6 +72,7 @@ class Bomb extends StaticEntity {
                 if (!wallTop) wallTop = process (x, y);
             }
 
+            if (onBoom != null) onBoom ();
             ctx.level.removeEntity (this);
         });
     }

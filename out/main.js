@@ -1204,6 +1204,9 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 					}
 				}
 			}
+			if(_gthis.onBoom != null) {
+				_gthis.onBoom();
+			}
 			_gthis.ctx.level.removeEntity(_gthis);
 		});
 	}
@@ -1385,6 +1388,7 @@ ent_MovingEntity.prototype = $extend(ent_Entity.prototype,{
 var ent_Player = function() {
 	this.wasBombCollide = false;
 	this.placedBomb = null;
+	this.placedCount = 0;
 	this.speed = 0.03;
 	ent_MovingEntity.call(this);
 	this.model = this.ctx.modelCache.loadModel(hxd_Res.get_loader().loadModel("testchar.fbx"));
@@ -1454,8 +1458,16 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		}
 	}
 	,placeBomb: function() {
+		var _gthis = this;
+		if(this.placedCount >= this.ctx.settings.player._maxBombCount) {
+			return;
+		}
+		this.placedCount += 1;
 		this.placedBomb = this.ctx.entityFactory.recycleBomb();
 		this.ctx.level.placeEntity(this.model.x,this.model.y,this.placedBomb);
+		this.placedBomb.onBoom = function() {
+			_gthis.placedCount -= 1;
+		};
 		this.placedBomb.startTimer();
 	}
 	,onFilterCollision: function(c) {
