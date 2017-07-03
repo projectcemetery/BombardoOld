@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="1">
+<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" nextobjectid="4">
  <tileset firstgid="1" source="../art/Terrain.tsx"/>
  <layer name="Floor" width="20" height="20">
   <data encoding="base64" compression="zlib">
    eJxjYKA+0GOkDh41b9S8UfNGzRs1j7rmURMAAGpaO30=
   </data>
  </layer>
+ <layer name="DestructableWalls" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJy9U0EOACAI8sX9/9jVOVSYJVuHJiKWmu3guIPuFmKsTlfT51ScKlfR6/RRnsJhuIwn1Avqi+m109gGmrWON/nTrC7rr/KkoNqpCRRPGU+dIxT7qcdA1Xuxq7G28g4bu3gBFncniQ==
+  </data>
+ </layer>
  <layer name="Walls" width="20" height="20">
   <data encoding="base64" compression="zlib">
    eJytlFEOwCAMQvVI3v9y/pqGB9Vo0szNlgFW1xxjfY6XoepOPIWt1s/3ilsxVK1a7+I5TZRLOYqT00r5yrObea0lDklXxSBtDiPtk9Pb+R9ppHrn2c1+vPio+CUdjo/rqe5wHOgbnSt6dv1LvlW81A/dHk4+Jk/pPqAcxTXp+BkbzNQndQ==
+  </data>
+ </layer>
+ <layer name="PlayerSpawn" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA+cGGiTH4UUBeMhvfwBqPxOwoGCgAAGeMBGQ==
+  </data>
+ </layer>
+ <layer name="MobSpawn" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4A+IJdpoF1AG0Bvfw3XcKQWGGrhM9TciwwABL0CLA==
   </data>
  </layer>
 </map>

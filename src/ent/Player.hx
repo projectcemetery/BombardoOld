@@ -121,7 +121,7 @@ class Player extends MovingEntity {
         model = ctx.modelCache.loadModel(hxd.Res.testchar);
         model.scale (0.0015);
 
-        ctx.level.placeEntity (4, 3, this);
+        ctx.level.placePlayer (this);
         
         setOnFilterCollision (onFilterCollision);
         setOnMoveComplete (onMoveComplete);

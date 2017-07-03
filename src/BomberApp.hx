@@ -97,9 +97,7 @@ class BomberApp extends hxd.App {
         dir.color.set(0.15, 0.15, 0.15);
         
         s3d.camera.zNear = 0.01;
-        s3d.camera.zFar = 100;
-        s3d.camera.pos.set (4.0, 16.0, 20);
-        s3d.camera.target.set (4.0, 3, 0);
+        s3d.camera.zFar = 100;        
 
         // TODO: background of game level
         /*var skyTexture = new h3d.mat.Texture(128, 128, [Cube, MipMapped]);

@@ -4,9 +4,11 @@ import h3d.scene.Mesh;
 import h3d.col.Bounds;
 import col.Side;
 import col.CollisionInfo;
+import h3d.col.Point;
 import ent.Entity;
 import ent.StaticEntity;
 import ent.EntityFactory;
+import ent.Player;
 import prim.CubeSide;
 
 /**
@@ -14,6 +16,31 @@ import prim.CubeSide;
  */
 class Level {
     
+    /**
+     *  Wall layer name
+     */
+    static inline var WALLS_LAYER = "Walls";
+
+    /**
+     *  Destructable wall layer name
+     */
+    static inline var DESTRUCTABLE_WALLS_LAYER = "DestructableWalls";
+
+    /**
+     *  Floor layer name
+     */
+    static inline var FLOOR_LAYER = "Floor";
+
+    /**
+     *  Mob spawn layer name
+     */
+    static inline var PLAYER_SPAWN_LAYER = "PlayerSpawn";
+
+    /**
+     *  Player spawn layer name
+     */
+    static inline var MOB_SPAWN_LAYER = "MobSpawn";
+
     /**
      *  Main 3d scene
      */
@@ -65,19 +92,29 @@ class Level {
     var mapHeight : Int;
 
     /**
+     *  Player spawn points
+     */
+    var playerSpawnPoints = new Array<Point> ();
+
+    /**
+     *  Mob spawn points
+     */
+    var mobSpawnPoints = new Array<Point> ();
+
+    /**
      *  Map for walls
      */
-    var wallMap : Map<Int, Bounds> = new Map<Int, Bounds> ();
+    var wallMap = new Map<Int, Bounds> ();
 
     /**
      *  Static entities that does not move from cell
      */
-    var cellEntities : Map<Int, Entity> = new Map<Int, Entity> ();
+    var cellEntities = new Map<Int, Entity> ();
 
     /**
      *  Moving entities
      */
-    var moveEntities : Array<Entity> = new Array<Entity> ();
+    var moveEntities : Array<Entity> = new Array<Entity> ();    
 
     /**
      *  Get linear cell position
@@ -110,6 +147,15 @@ class Level {
     }
 
     /**
+     *  Add destructable wall
+     *  @param x - 
+     *  @param y - 
+     */
+    function addDestructableWall (x : Int, y : Int) : Void {
+
+    }
+
+    /**
      *  Add floor
      *  @param x - 
      *  @param y - 
@@ -139,18 +185,18 @@ class Level {
                 
                 if (dat > 0) {
                     switch (layer.name) {
-                        case "Walls": addWall (x, y);
-                        case "Floor": addFloor (x, y);                        
+                        case WALLS_LAYER : addWall (x, y);
+                        case DESTRUCTABLE_WALLS_LAYER: addDestructableWall (x, y);
+                        case FLOOR_LAYER : addFloor (x, y);
+                        case PLAYER_SPAWN_LAYER: 
+                            playerSpawnPoints.push (new Point (x,y));
+                        case MOB_SPAWN_LAYER: 
+                            mobSpawnPoints.push (new Point (x,y));
                         default:
                     }
                 }   
                 
                 x += 1;
-            }
-
-            // Add object to map
-            for (obj in layer.objects) {
-                
             }
         }
     }
@@ -363,7 +409,7 @@ class Level {
 
         createLevel ();
         
-        var mob = entityFactory.recicleMob ();
+        /*var mob = entityFactory.recicleMob ();
         placeEntity (6,1, mob);
 
         var mob = entityFactory.recicleMob ();
@@ -373,7 +419,7 @@ class Level {
         placeEntity (8,1, mob);
 
         var mob = entityFactory.recicleMob ();
-        placeEntity (9,1, mob);
+        placeEntity (9,1, mob);*/
     }
 
     /**
@@ -386,6 +432,19 @@ class Level {
             x : Math.floor (x),
             y : Math.floor (y)
         }
+    }
+
+    /**
+     *  Place player in free spawn point
+     *  @param player - 
+     */
+    public function placePlayer (player : Player) : Void {        
+        var rndIndex = Math.floor (Math.random () * playerSpawnPoints.length);
+        if (rndIndex >= playerSpawnPoints.length) rndIndex = playerSpawnPoints.length - 1;
+        var point = playerSpawnPoints[rndIndex];        
+        placeEntity (point.x, point.y, player);
+        s3d.camera.pos.set (point.x, point.y + 13.0, 20);
+        s3d.camera.target.set (point.x, point.y, 0);
     }
 
     /**
