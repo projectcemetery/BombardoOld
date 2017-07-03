@@ -1,8 +1,5 @@
 package ent;
 
-import map.Level;
-import ent.EntityFactory;
-
 /**
  *  Bomb entity
  */

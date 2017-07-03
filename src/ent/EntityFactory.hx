@@ -71,4 +71,12 @@ class EntityFactory {
         // TODO recicle
         return new Mob ();
     }
+
+    /**
+     *  Get DestructableWall
+     *  @return DestructableWall
+     */
+    public function recycleDestructableWall () : DestructableWall {
+        return new DestructableWall ();
+    }   
 }

@@ -152,7 +152,8 @@ class Level {
      *  @param y - 
      */
     function addDestructableWall (x : Int, y : Int) : Void {
-
+        var wall = entityFactory.recycleDestructableWall ();
+        placeCellEntity (x, y, wall);
     }
 
     /**
