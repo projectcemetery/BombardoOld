@@ -202,6 +202,16 @@ class Level {
     }
 
     /**
+     *  Place mobs in map
+     */
+    function placeMobs () {
+        for (p in mobSpawnPoints) {
+            var mob = entityFactory.recicleMob ();
+            placeEntity (p.x, p.y, mob);
+        }
+    }
+
+    /**
      *  Place static cell entity to map
      *  @param x - 
      *  @param y - 
@@ -409,17 +419,8 @@ class Level {
 
         createLevel ();
         
-        /*var mob = entityFactory.recicleMob ();
-        placeEntity (6,1, mob);
-
-        var mob = entityFactory.recicleMob ();
-        placeEntity (7,1, mob);
-
-        var mob = entityFactory.recicleMob ();
-        placeEntity (8,1, mob);
-
-        var mob = entityFactory.recicleMob ();
-        placeEntity (9,1, mob);*/
+        // TODO settings about mobs in player settings
+        placeMobs ();        
     }
 
     /**

@@ -50133,6 +50133,16 @@ map_Level.prototype = {
 			}
 		}
 	}
+	,placeMobs: function() {
+		var _g = 0;
+		var _g1 = this.mobSpawnPoints;
+		while(_g < _g1.length) {
+			var p = _g1[_g];
+			++_g;
+			var mob = this.entityFactory.recicleMob();
+			this.placeEntity(p.x,p.y,mob);
+		}
+	}
 	,placeCellEntity: function(x,y,entity) {
 		var mapPos = this.getMapPos(x,y);
 		var pos = mapPos.y * this.mapWidth + mapPos.x;
@@ -50317,6 +50327,7 @@ map_Level.prototype = {
 		this.levelPrim = new h3d_prim_BigPrimitive(8);
 		this.levelMesh = new h3d_scene_Mesh(this.levelPrim,this.levelMat,this.s3d);
 		this.createLevel();
+		this.placeMobs();
 	}
 	,getMapPos: function(x,y) {
 		return { x : Math.floor(x), y : Math.floor(y)};
