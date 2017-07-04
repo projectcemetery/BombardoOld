@@ -190,8 +190,8 @@ BomberApp.prototype = $extend(hxd_App.prototype,{
 		_this.y = 0.15;
 		_this.z = 0.15;
 		_this.w = 1.;
-		this.s3d.camera.zNear = 0.01;
-		this.s3d.camera.zFar = 100;
+		this.s3d.camera.zNear = 1;
+		this.s3d.camera.zFar = 30;
 	}
 	,update: function(dt) {
 		this.waitEvent.update(dt);

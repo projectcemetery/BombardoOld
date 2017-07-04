@@ -1,5 +1,4 @@
 import h3d.scene.*;
-import h3d.shader.BaseMesh;
 import ent.Player;
 import ent.EntityFactory;
 import map.Level;
@@ -96,8 +95,8 @@ class BomberApp extends hxd.App {
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
         dir.color.set(0.15, 0.15, 0.15);
         
-        s3d.camera.zNear = 0.01;
-        s3d.camera.zFar = 100;        
+        s3d.camera.zNear = 1;
+        s3d.camera.zFar = 30;        
 
         // TODO: background of game level
         /*var skyTexture = new h3d.mat.Texture(128, 128, [Cube, MipMapped]);
@@ -123,7 +122,5 @@ class BomberApp extends hxd.App {
 
 	override function update( dt : Float ) {        
         waitEvent.update (dt);
-
-        //trace (engine.drawCalls, engine.drawTriangles);
     }
 }
