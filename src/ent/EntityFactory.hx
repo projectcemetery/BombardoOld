@@ -32,7 +32,7 @@ class EntityFactory {
         // TODO load from file default settings
 
         bombSettings = {
-            lifetime : 2.0,
+            lifetime : 3.0,
             length : 2
         }
 
@@ -51,7 +51,7 @@ class EntityFactory {
      */
     public function recycleBomb () : Bomb {
         // TODO recycle
-        return bomb;
+        return new Bomb (bombSettings);
     }
 
     /**

@@ -6,14 +6,81 @@ package ent;
 class Bomb extends StaticEntity {    
 
     /**
+     *  Particles
+     */
+    var parts : h3d.parts.GpuParticles;
+
+	/**
+	 *  Particle group
+	 */
+	var group : h3d.parts.GpuParticles.GpuPartGroup;
+
+    /**
      *  Settings for bomb
      */
     var bombSettings : BombSettings;
+    
+    /**
+     *  Bomb is armed
+     */
+    var isArmed : Bool;
+
+    /**
+     *  Time for animation
+     */
+    var time : Float;
 
     /**
      *  Call back on boom
      */
     public var onBoom : Void -> Void;
+
+    /**
+     *  On logic update
+     *  @param dt - 
+     */
+    function onUpdate (dt : Float) : Void {
+        if (!isArmed) return;
+        time += dt;
+        if (time < 30) {
+            model.scale (1.007);
+        } else {
+            model.scale (0.995);
+        }
+
+        if (time > 70) time = 0;
+    }
+
+    /**
+     *  Create particle emitter
+     */
+    function createEmitter () : Void {
+        parts = new h3d.parts.GpuParticles(ctx.s3d);
+        parts.visible = false;
+
+        var g = new h3d.parts.GpuParticles.GpuPartGroup();        
+        g.texture = hxd.Res.bombburn.toTexture ();
+        g.emitMode = Cone;
+		g.emitAngle = 0.3;
+		g.emitDist = 0;
+
+		g.fadeIn = 0.1;
+		g.fadeOut = 0.4;
+		g.gravity = 1;
+		g.size = 0.3;
+		g.sizeRand = 0.6;
+
+		g.rotSpeed = 10;
+
+		g.speed = 3;
+		g.speedRand = 0.5;
+
+		g.life = 0.3;
+		g.lifeRand = 0.5;
+		g.nparts = 100;
+        group = g;
+        parts.addGroup (g);
+    }
 
     /**
      *  Constructor
@@ -25,12 +92,22 @@ class Bomb extends StaticEntity {
         model = ctx.modelCache.loadModel(hxd.Res.bomb);
         model.rotate (0.3, 0.0, 0.0);        
         model.scale (0.003);
+        time = 0;        
+        createEmitter ();
+
+        setOnUpdate (onUpdate);        
     }
 
     /**
      *  Start bomb timer
      */
     public function startTimer () : Void {
+        isArmed = true;
+        parts.visible = true;
+        parts.x = model.x + 0.01;
+        parts.y = model.y - 0.08;
+        parts.z = 1.1;
+
         ctx.waitEvent.wait (bombSettings.lifetime, function () {
             var wallLeft = false;
             var wallRight = false;
@@ -72,5 +149,13 @@ class Bomb extends StaticEntity {
             if (onBoom != null) onBoom ();
             ctx.level.removeEntity (this);
         });
+    }
+
+    /**
+     *  Dispose bomb
+     */
+    override public function onDispose () : Void {
+        super.onDispose ();
+        if (parts != null) parts.remove ();
     }
 }
