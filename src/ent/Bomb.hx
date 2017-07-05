@@ -14,11 +14,6 @@ class Bomb extends StaticEntity {
 	 *  Particle group
 	 */
 	var group : h3d.parts.GpuParticles.GpuPartGroup;
-
-    /**
-     *  Settings for bomb
-     */
-    var bombSettings : BombSettings;
     
     /**
      *  Bomb is armed
@@ -85,9 +80,8 @@ class Bomb extends StaticEntity {
     /**
      *  Constructor
      */
-    public function new (bombSettings : BombSettings) {
+    public function new () {
         super ();
-        this.bombSettings = bombSettings;        
         
         model = ctx.modelCache.loadModel(hxd.Res.bomb);
         model.rotate (0.3, 0.0, 0.0);        
@@ -108,7 +102,10 @@ class Bomb extends StaticEntity {
         parts.y = model.y - 0.08;
         parts.z = 1.1;
 
-        ctx.waitEvent.wait (bombSettings.lifetime, function () {
+        var lifetime = ctx.settings.player.beforeBoom;
+        var boomLength = ctx.settings.player.bombBoomLength;
+
+        ctx.waitEvent.wait (lifetime, function () {
             var wallLeft = false;
             var wallRight = false;
             var wallTop = false;
@@ -128,7 +125,7 @@ class Bomb extends StaticEntity {
             var pos = getPos ();
             var mapPos = ctx.level.getMapPos (pos.x, pos.y);
             process (mapPos.x, mapPos.y);
-            for (i in 0...bombSettings.length - 1) {
+            for (i in 0...boomLength - 1) {
                 var x = mapPos.x + (i + 1);
                 var y = mapPos.y;
                 if (!wallRight) wallRight = process (x, y);

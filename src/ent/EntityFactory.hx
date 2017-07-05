@@ -6,21 +6,6 @@ package ent;
 class EntityFactory {
 
     /**
-     *  Settings for bomb
-     */
-    public var bombSettings : BombSettings;
-
-    /**
-     *  Explosion settings
-     */
-    public var explosionSettings : ExplosionSettings;
-
-    /**
-     *  Bombs for recycle;
-     */
-    var bomb : Bomb;
-
-    /**
      *  Constructor
      */
     public function new () {}
@@ -28,19 +13,9 @@ class EntityFactory {
     /**
      *  Init after create
      */
-    public function init () {
-        // TODO load from file default settings
-
-        bombSettings = {
-            lifetime : 3.0,
-            length : 2
-        }
-
-        explosionSettings = {
-            lifetime : 1.0
-        }
-
-        bomb = new Bomb (bombSettings);
+    public function init () {  
+        // Preload
+        new Bomb ();      
     }
 
     /**
@@ -51,7 +26,7 @@ class EntityFactory {
      */
     public function recycleBomb () : Bomb {
         // TODO recycle
-        return new Bomb (bombSettings);
+        return new Bomb ();
     }
 
     /**
@@ -60,7 +35,7 @@ class EntityFactory {
      */
     public function recycleExplosion () : Explosion {
         // TODO recycle
-        return new Explosion (explosionSettings);
+        return new Explosion ();
     }
 
     /**
