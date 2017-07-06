@@ -1,4 +1,4 @@
-package hud;
+package gui;
 
 import h2d.Scene;
 import h2d.Sprite;

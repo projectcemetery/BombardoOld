@@ -3,7 +3,7 @@ package ent;
 /**
  *  Bomb entity
  */
-class Bomb extends StaticEntity {    
+class Bomb extends StaticEntity {
 
     /**
      *  Particles

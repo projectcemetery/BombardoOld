@@ -2,7 +2,9 @@ import h3d.scene.*;
 import ent.Player;
 import ent.EntityFactory;
 import map.Level;
-import hud.Hud;
+import gui.Hud;
+import screen.Screen;
+import screen.GameScreen;
 import settings.Settings;
 
 /**
@@ -14,6 +16,16 @@ class BomberApp extends hxd.App {
      *  Instance of app
      */
     static var instance : BomberApp;
+
+    /**
+     *  Player mesh
+     */
+    var player : Player;
+
+    /**
+     *  Game screens
+     */
+    var screens : Map<String, Screen>;
 
     /**
      *  Cache for models
@@ -28,12 +40,7 @@ class BomberApp extends hxd.App {
     /**
      *  Event dispatcher
      */
-    public var dispatcher (default, null) : dispatch.Dispatcher;
-
-    /**
-     *  Player mesh
-     */
-    var player : Player;
+    public var dispatcher (default, null) : dispatch.Dispatcher;    
 
     /**
      *  Current game level
@@ -85,6 +92,9 @@ class BomberApp extends hxd.App {
         hud = new Hud ();
         entityFactory = new EntityFactory ();
 
+        screens = new Map<String, Screen> ();
+        screens["GameScreen"] = new GameScreen ();
+
         settings.init ();
         level.init ();
         entityFactory.init ();
@@ -96,7 +106,11 @@ class BomberApp extends hxd.App {
         dir.color.set(0.15, 0.15, 0.15);
         
         s3d.camera.zNear = 1;
-        s3d.camera.zFar = 30;    
+        s3d.camera.zFar = 30;
+
+        /*var gameover = new gui.GameOverDialog ();
+        gameover.init ();
+        gameover.show ();*/
 
         /*var model = modelCache.loadModel(hxd.Res.bombpowerup);    
         model.scale (0.006);
