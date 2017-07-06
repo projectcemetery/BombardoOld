@@ -163,7 +163,7 @@ class Level {
      */
 
     function addFloor (x : Int, y : Int) {
-        levelPrim.add (floorCube.buffer, floorCube.idx, x, y);
+        levelPrim.add (floorCube.buffer, floorCube.idx, x, y, -1);
     }
 
     /**
@@ -407,7 +407,7 @@ class Level {
         wallCube.prepare ();
 
         floorCube = new prim.PartialCube (1, 2);
-        floorCube.setSideInfo (CubeSide.STop, 1, true);
+        floorCube.setSideInfo (CubeSide.SBottom, 1);
         floorCube.prepare ();
 
         var levelTex = hxd.Res.level.toTexture ();
