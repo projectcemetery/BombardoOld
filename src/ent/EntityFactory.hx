@@ -9,15 +9,7 @@ class EntityFactory {
      *  Constructor
      */
     public function new () {}
-
-    /**
-     *  Init after create
-     */
-    public function init () {  
-        // Preload
-        new Bomb ();      
-    }
-
+    
     /**
      *  Recycle bomb
      *  @param x - 

@@ -36,7 +36,8 @@ class DestructableWall extends StaticEntity {
             cube.addUVs ();
         }
 
-        model = new Mesh (cube, mat, ctx.s3d);
+        model = new Mesh (cube, mat);
+        ctx.scene3d.addChild (model);
     }
 
     /**

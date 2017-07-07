@@ -37,11 +37,11 @@ class Player extends MovingEntity {
      *  @param x - 
      */
     function onMoveComplete (dx : Float, dy : Float) : Void {
-        ctx.s3d.camera.pos.x += dx;
+        /*ctx.s3d.camera.pos.x += dx;
         ctx.s3d.camera.target.x += dx;
         
         ctx.s3d.camera.pos.y += dy;
-        ctx.s3d.camera.target.y += dy;
+        ctx.s3d.camera.target.y += dy;*/
 
         if (dx > 0) {
             model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);

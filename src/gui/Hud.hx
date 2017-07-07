@@ -4,13 +4,9 @@ import h2d.Scene;
 import h2d.Sprite;
 import h2d.Bitmap;
 import h2d.Font;
+import app.GameContext;
 
-class Hud extends Sprite {
-
-    /**
-     *  Game context
-     */
-    var ctx : BomberApp;
+class Hud extends Gui {
 
     /**
      *  Space between items
@@ -80,20 +76,20 @@ class Hud extends Sprite {
     function showDebug () {
         if (isDebug) return;
         var font = hxd.Res.trueTypeFont.build(16);
-        drawCallTxt = new h2d.Text(font, ctx.s2d);		
+        drawCallTxt = new h2d.Text(font, ctx.scene2d);		
 		drawCallTxt.textColor = 0xFFFFFF;
-        drawCallTxt.x = ctx.s2d.width - 200;
+        drawCallTxt.x = ctx.scene2d.width - 200;
         drawCallTxt.y = 10;
         drawCallTxt.text = "";
         
-        triangleTxt = new h2d.Text(font, ctx.s2d);		
+        triangleTxt = new h2d.Text(font, ctx.scene2d);		
 		triangleTxt.textColor = 0xFFFFFF;
-        triangleTxt.x = ctx.s2d.width - 200;
+        triangleTxt.x = ctx.scene2d.width - 200;
         triangleTxt.y = 30;
 
-        fpsTxt = new h2d.Text(font, ctx.s2d);		
+        fpsTxt = new h2d.Text(font, ctx.scene2d);		
 		fpsTxt.textColor = 0xFFFFFF;
-        fpsTxt.x = ctx.s2d.width - 200;
+        fpsTxt.x = ctx.scene2d.width - 200;
         fpsTxt.y = 50;
 
         isDebug = true;
@@ -128,7 +124,7 @@ class Hud extends Sprite {
      *  On post create
      */
     public function init () {
-        ctx = BomberApp.get ();
+        ctx = GameContext.get ();
 
         var font = hxd.Res.trueTypeFont.build(24);
         
@@ -164,7 +160,7 @@ class Hud extends Sprite {
 
         this.x = 10;
         this.y = 10;
-        ctx.s2d.addChild (this);        
+        ctx.scene2d.addChild (this);
 
         ctx.dispatcher.addHandler (settings.PlayerSettings.SCORE, function (e) {
             setScore (e);

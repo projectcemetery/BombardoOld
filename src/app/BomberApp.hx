@@ -1,3 +1,5 @@
+package app;
+
 import h3d.scene.*;
 import ent.Player;
 import ent.EntityFactory;
@@ -18,50 +20,15 @@ class BomberApp extends hxd.App {
     static var instance : BomberApp;
 
     /**
+     *  Game context
+     */
+    var ctx : GameContext;
+
+    /**
      *  Player mesh
      */
-    var player : Player;
-
-    /**
-     *  Game screens
-     */
-    var screens : Map<String, Screen>;
-
-    /**
-     *  Cache for models
-     */
-    public var modelCache (default, null) : h3d.prim.ModelCache;
-
-    /**
-     *  For creating timers
-     */
-    public var waitEvent (default, null) : hxd.WaitEvent;
-
-    /**
-     *  Event dispatcher
-     */
-    public var dispatcher (default, null) : dispatch.Dispatcher;    
-
-    /**
-     *  Current game level
-     */
-    public var level (default, null) : Level;        
-
-    /**
-     *  Player hud
-     */
-    public var hud (default, null) : Hud;
-
-    /**
-     *  Entity factory
-     */
-    public var entityFactory (default, null) : EntityFactory;
-
-    /**
-     *  All settings
-     */
-    public var settings (default, null) : Settings;
-
+    var player : Player;    
+    
     /**
      *  Get app
      *  @return BomberApp
@@ -74,33 +41,17 @@ class BomberApp extends hxd.App {
      *  Notify that mob was killed
      */
     public function onMobKilled () : Void {
-        settings.player.score += 5;
+        //settings.player.score += 5;
     }
 
     /**
      *  On app init
      */
-    override function init() {
-        instance = this;
-        
-        waitEvent = new hxd.WaitEvent ();
-        modelCache = new h3d.prim.ModelCache();
+    override function init() {        
+        ctx = new GameContext (this);
+        ctx.init ();
 
-        dispatcher = dispatch.Dispatcher.get ();
-        settings = new Settings ();
-        level = new Level ();
-        hud = new Hud ();
-        entityFactory = new EntityFactory ();
-
-        screens = new Map<String, Screen> ();
-        screens["GameScreen"] = new GameScreen ();
-
-        settings.init ();
-        level.init ();
-        entityFactory.init ();
-        hud.init ();
-
-        player = new Player ();
+        //player = new Player ();
 
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
         dir.color.set(0.15, 0.15, 0.15);
@@ -140,6 +91,6 @@ class BomberApp extends hxd.App {
 	}
 
 	override function update( dt : Float ) {        
-        waitEvent.update (dt);
+        ctx.waitEvent.update (dt);
     }
 }

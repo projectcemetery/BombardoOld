@@ -5,6 +5,7 @@ import h3d.col.Bounds;
 import h3d.scene.Object;
 import col.CollisionInfo;
 import col.Side;
+import app.GameContext;
 
 /**
  *  Base entity class
@@ -14,7 +15,7 @@ class Entity {
     /**
      *  Game context
      */
-    var ctx : BomberApp;
+    var ctx : GameContext;
 
     /**
      *  Is entity disposed
@@ -109,7 +110,7 @@ class Entity {
      *  Constructor
      */
     public function new () {
-        ctx = BomberApp.get ();
+        ctx = GameContext.get ();
         boundWidth = 0.8;
         boundHeight = 0.8;
         bounds = Bounds.fromValues (0,0,0, boundWidth, boundHeight, 1);

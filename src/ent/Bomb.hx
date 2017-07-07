@@ -50,7 +50,8 @@ class Bomb extends StaticEntity {
      *  Create particle emitter
      */
     function createEmitter () : Void {
-        parts = new h3d.parts.GpuParticles(ctx.s3d);
+        parts = new h3d.parts.GpuParticles();
+        ctx.scene3d.addChild (parts);
         parts.visible = false;
 
         var g = new h3d.parts.GpuParticles.GpuPartGroup();        

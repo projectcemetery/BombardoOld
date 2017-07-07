@@ -2,6 +2,8 @@ package ent;
 
 import col.Side;
 import col.CollisionInfo;
+import app.BomberApp;
+
 
 /**
  *  Class for mob
