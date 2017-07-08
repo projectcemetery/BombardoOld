@@ -8,27 +8,7 @@ typedef EventHandler = Dynamic -> Void;
 /**
  *  Dispatch events
  */
-class Dispatcher {
-
-    /**
-     *  Dispatecher instance
-     */
-    static var instance : Dispatcher;
-
-    /**
-     *  Return dispatcher instance
-     *  @return Dispatcher
-     */
-    public inline static function get () : Dispatcher {
-        return instance;
-    }
-
-    /**
-     *  On class create
-     */
-    static function __init__ () {
-        instance = new Dispatcher ();
-    }
+class Dispatcher {   
 
     /**
      *  Handlers to notify changes
@@ -38,7 +18,7 @@ class Dispatcher {
     /**
      *  Constructor
      */
-    function new () {
+    public function new () {
         handlers = new Map<String, Array<EventHandler>> ();
     }
 

@@ -74,7 +74,7 @@ class Explosion extends StaticEntity {
 
         var lifetime = ctx.settings.player.boomTime;
         ctx.waitEvent.wait (lifetime, function () {
-            ctx.level.removeEntity (this);
+            level.removeEntity (this);
         });
     }
 }

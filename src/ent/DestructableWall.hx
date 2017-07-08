@@ -36,13 +36,14 @@ class DestructableWall extends StaticEntity {
             cube.addUVs ();
         }
 
-        model = new Mesh (cube, mat, ctx.s3d);
+        model = new Mesh (cube, mat);
+        ctx.scene3d.addChild (model);
     }
 
     /**
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
-        ctx.level.removeEntity (this);
+        level.removeEntity (this);
     }
 }

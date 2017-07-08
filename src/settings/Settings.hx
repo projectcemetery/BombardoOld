@@ -14,12 +14,6 @@ class Settings {
      *  Constructor
      */
     public function new () {
-    }
-
-    /**
-     *  On post create
-     */
-    public function init () : Void {
         // TODO read from somethere. Tarantool???
         player = new PlayerSettings ();
     }

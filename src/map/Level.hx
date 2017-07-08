@@ -7,9 +7,14 @@ import col.CollisionInfo;
 import h3d.col.Point;
 import ent.Entity;
 import ent.StaticEntity;
-import ent.EntityFactory;
 import ent.Player;
 import prim.CubeSide;
+import app.GameContext;
+import ent.MovingEntity;
+import ent.Bomb;
+import ent.DestructableWall;
+import ent.Explosion;
+import ent.Mob;
 
 /**
  *  Game level
@@ -39,17 +44,12 @@ class Level {
     /**
      *  Player spawn layer name
      */
-    static inline var MOB_SPAWN_LAYER = "MobSpawn";
+    static inline var MOB_SPAWN_LAYER = "MobSpawn";    
 
     /**
-     *  Main 3d scene
+     *  Game context
      */
-    var s3d : h3d.scene.Scene;
-
-    /**
-     *  Entity factory
-     */
-    var entityFactory : EntityFactory;
+    var ctx : GameContext;
 
     /**
      *  Box for walls and floor
@@ -152,7 +152,7 @@ class Level {
      *  @param y - 
      */
     function addDestructableWall (x : Int, y : Int) : Void {
-        var wall = entityFactory.recycleDestructableWall ();
+        var wall = recycleDestructableWall ();
         placeCellEntity (x, y, wall);
     }
 
@@ -205,9 +205,9 @@ class Level {
     /**
      *  Place mobs in map
      */
-    function placeMobs () {
+    function placeMobs () {        
         for (p in mobSpawnPoints) {
-            var mob = entityFactory.recicleMob ();
+            var mob = recicleMob ();
             placeEntity (p.x, p.y, mob);
         }
     }
@@ -222,7 +222,7 @@ class Level {
         var mapPos = getMapPos (x, y);
         var pos = mapPos.y * mapWidth + mapPos.x;
         cellEntities[pos] = entity;
-        s3d.addChild (entity.model);
+        ctx.scene3d.addChild (entity.model);
         entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
     }
 
@@ -235,7 +235,7 @@ class Level {
         var mapPos = getMapPos (ps.x, ps.y);
         var pos = mapPos.y * mapWidth + mapPos.x;
         cellEntities.remove (pos);
-        s3d.removeChild (entity.model);
+        ctx.scene3d.removeChild (entity.model);
     }
 
     /**
@@ -259,7 +259,7 @@ class Level {
     function placeMoveEntity (x : Float, y : Float, entity : Entity) : Void {
         var mapPos = getMapPos (x, y);
         entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
-        s3d.addChild (entity.model);
+        ctx.scene3d.addChild (entity.model);
         moveEntities.push (entity);
     }
 
@@ -269,7 +269,7 @@ class Level {
      */
     function removeMoveEntity (entity : Entity) : Void {
         moveEntities.remove (entity);
-        s3d.removeChild (entity.model);
+        ctx.scene3d.removeChild (entity.model);
     }
 
     /**
@@ -393,14 +393,8 @@ class Level {
     /**
      *  Constructor
      */
-    public function new () {}
-
-     /**
-     *  Init after create
-     */
-    public function init () {
-        s3d = BomberApp.get ().s3d;
-        entityFactory = BomberApp.get ().entityFactory;
+    public function new () {
+        ctx = GameContext.get ();
 
         wallCube = new prim.PartialCube (1, 2);
         wallCube.full ();
@@ -414,14 +408,74 @@ class Level {
         levelMat = new h3d.mat.MeshMaterial (levelTex);
         levelMat.mainPass.enableLights = true;
         levelMat.shadows = true;
+    }
+
+    /**
+     *  Recycle bomb
+     *  @param type - 
+     */
+    public function recycleBomb () : Bomb {
+        // TODO recycle
+        return new Bomb ();
+    }
+
+    /**
+     *  Get explosion
+     *  @return Explosion
+     */
+    public function recycleExplosion () : Explosion {
+        // TODO recycle
+        return new Explosion ();
+    }
+
+    /**
+     *  Get mob
+     *  @return Mob
+     */
+    public function recicleMob () : Mob {
+        // TODO recicle
+        return new Mob ();
+    }
+
+    /**
+     *  Get DestructableWall
+     *  @return DestructableWall
+     */
+    public function recycleDestructableWall () : DestructableWall {
+        return new DestructableWall ();
+    }
+
+     /**
+     *  Init after create
+     */
+    public function restart () {
+        // Preload
+        var bomb = recycleBomb ();        
+        bomb.onDispose ();
+
+        playerSpawnPoints = new Array<Point> ();
+        mobSpawnPoints = new Array<Point> ();
+        wallMap = new Map<Int, Bounds> ();
+
+        var entities = new Array<Entity> ();
+        for (e in cellEntities) entities.push (e);
+        for (e in entities) removeEntity (e);
+        cellEntities = new Map<Int, Entity> ();        
+                
+        for (e in moveEntities) entities.push (e);
+        for (e in entities) removeEntity (e);
+        moveEntities = new Array<Entity> ();   
+
+        ctx.scene3d.removeChild (levelMesh);
 
         levelPrim = new h3d.prim.BigPrimitive (8);
-        levelMesh = new h3d.scene.Mesh (levelPrim, levelMat, s3d);
+        levelMesh = new h3d.scene.Mesh (levelPrim, levelMat);
 
         createLevel ();
+        ctx.scene3d.addChild (levelMesh);
         
         // TODO settings about mobs in player settings
-        placeMobs ();        
+        placeMobs ();
     }
 
     /**
@@ -443,10 +497,16 @@ class Level {
     public function placePlayer (player : Player) : Void {        
         var rndIndex = Math.floor (Math.random () * playerSpawnPoints.length);
         if (rndIndex >= playerSpawnPoints.length) rndIndex = playerSpawnPoints.length - 1;
-        var point = playerSpawnPoints[rndIndex];        
+        var point = playerSpawnPoints[rndIndex];
         placeEntity (point.x, point.y, player);
-        s3d.camera.pos.set (point.x, point.y + 13.0, 20);
-        s3d.camera.target.set (point.x, point.y, 0);
+        
+        var to = point.clone ();
+        to.z = 0;
+
+        point.y += 13;
+        point.z = 20;
+
+        ctx.scene3d.camera.lookAt (point, to);
     }
 
     /**
@@ -489,7 +549,7 @@ class Level {
     public function removeEntity (entity : Entity) : Void {
         if (Std.is (entity, StaticEntity)) {
             removeCellEntity (entity);
-        } else {
+        } else if (Std.is (entity, MovingEntity)) {            
             removeMoveEntity (entity);
         }
 
