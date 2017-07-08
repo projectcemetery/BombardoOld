@@ -1,11 +1,7 @@
 package ent;
 
-import h3d.col.Bounds;
-import map.Level;
-import col.Side;
 import col.CollisionInfo;
 import ent.Bomb;
-import ent.EntityFactory;
 
 /**
  *  Player
@@ -37,11 +33,7 @@ class Player extends MovingEntity {
      *  @param x - 
      */
     function onMoveComplete (dx : Float, dy : Float) : Void {
-        /*ctx.s3d.camera.pos.x += dx;
-        ctx.s3d.camera.target.x += dx;
-        
-        ctx.s3d.camera.pos.y += dy;
-        ctx.s3d.camera.target.y += dy;*/
+        ctx.scene3d.camera.move (dx, dy);
 
         if (dx > 0) {
             model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
@@ -68,8 +60,8 @@ class Player extends MovingEntity {
 
         placedCount += 1;
         // Place bomb
-        placedBomb = ctx.entityFactory.recycleBomb ();
-        ctx.level.placeEntity (model.x, model.y, placedBomb);
+        placedBomb = level.recycleBomb ();
+        level.placeEntity (model.x, model.y, placedBomb);
         placedBomb.onBoom = function () {
             placedCount -= 1;
         };
@@ -116,22 +108,32 @@ class Player extends MovingEntity {
      *  Constructor
      */
     public function new  () {
-        super ();        
+        super ();
 
         model = ctx.modelCache.loadModel(hxd.Res.testchar);
         model.scale (0.0015);
+        reset ();
+    }
 
-        ctx.level.placePlayer (this);
+    /**
+     *  Reset player data
+     */
+    override public function reset () : Void {
+        placedCount = 0;
+        placedBomb = null;
+        wasBombCollide = false;
+        isDisposed = false;
         
         setOnFilterCollision (onFilterCollision);
         setOnMoveComplete (onMoveComplete);
-        setOnUpdate (onUpdate);       
+        setOnUpdate (onUpdate);
     }
 
     /**
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
-        ctx.level.removeEntity (this);
+        gameScreen.onPlayerDied ();
+        level.removeEntity (this);
     }
 }

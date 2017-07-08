@@ -1,4 +1,4 @@
-package app;
+package scene;
 
 /**
  *  Game scene with objects and camera
@@ -12,10 +12,16 @@ class Scene3d {
     var s3d : h3d.scene.Scene;
 
     /**
+     *  Camera
+     */
+    public var camera : Camera;
+
+    /**
      *  Constructor
      */
     public function new (scene : h3d.scene.Scene) {
         s3d = scene;
+        camera = new Camera (s3d);
     }
 
     /**

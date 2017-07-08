@@ -2,13 +2,11 @@ package ent;
 
 import col.Side;
 import col.CollisionInfo;
-import app.BomberApp;
-
 
 /**
  *  Class for mob
  */
-class Mob extends Entity {
+class Mob extends MovingEntity {
 
     /**
      *  Player speed
@@ -74,7 +72,7 @@ class Mob extends Entity {
      *  On player logic update
      *  @param dt - 
      */
-    function onUpdate (dt : Float) : Void {        
+    function onUpdate (dt : Float) : Void {
         switch (direction) {
             case Side.Top: move (0, -dt * speed);
             case Side.Bottom: move (0, dt * speed);
@@ -105,7 +103,7 @@ class Mob extends Entity {
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
-        BomberApp.get ().onMobKilled ();
-        ctx.level.removeEntity (this);
+        gameScreen.onMobKilled ();
+        level.removeEntity (this);
     }
 }

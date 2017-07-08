@@ -1,13 +1,7 @@
 package app;
 
-import h3d.scene.*;
 import ent.Player;
-import ent.EntityFactory;
-import map.Level;
-import gui.Hud;
-import screen.Screen;
 import screen.GameScreen;
-import settings.Settings;
 
 /**
  *  Main app of game
@@ -22,36 +16,16 @@ class BomberApp extends hxd.App {
     /**
      *  Game context
      */
-    var ctx : GameContext;
-
-    /**
-     *  Player mesh
-     */
-    var player : Player;    
-    
-    /**
-     *  Get app
-     *  @return BomberApp
-     */
-    public static inline function get () : BomberApp {
-        return instance;
-    }
-
-    /**
-     *  Notify that mob was killed
-     */
-    public function onMobKilled () : Void {
-        //settings.player.score += 5;
-    }
+    var ctx : GameContext;            
 
     /**
      *  On app init
      */
-    override function init() {        
+    override function init() {
         ctx = new GameContext (this);
-        ctx.init ();
 
-        //player = new Player ();
+        ctx.registerScreen (GameScreen.NAME, new GameScreen ());
+        ctx.startScreen (GameScreen.NAME);
 
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
         dir.color.set(0.15, 0.15, 0.15);

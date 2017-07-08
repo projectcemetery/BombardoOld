@@ -1,11 +1,11 @@
 package app;
 
-import ent.EntityFactory;
 import dispatch.Dispatcher;
 import settings.Settings;
 import map.Level;
 import gui.Hud;
 import screen.Screen;
+import scene.Scene3d;
 
 /**
  *  All classes needed for game
@@ -38,14 +38,14 @@ class GameContext {
     public var scene3d (default, null) : Scene3d;
 
     /**
+     *  Current game screen
+     */
+    public var screen (default, null) : Screen;
+
+    /**
      *  For creating timers
      */
     public var waitEvent (default, null) : hxd.WaitEvent;
-
-    /**
-     *  Entity factory
-     */
-    public var entityFactory (default, null) : EntityFactory;
 
     /**
      *  Cache for models
@@ -61,18 +61,6 @@ class GameContext {
      *  Event dispatcher
      */
     public var dispatcher (default, null) : Dispatcher;
-
-    /**
-     *  Player hud
-     *  TODO: remove
-     */
-    public var hud (default, null) : Hud;
-
-    /**
-     *  Current game level
-     *  TODO: remove
-     */
-    public var level (default, null) : Level;  
 
     /**
      *  Return instance
@@ -93,24 +81,32 @@ class GameContext {
         scene3d = new Scene3d (app.s3d);
         waitEvent = new hxd.WaitEvent ();
         modelCache = new h3d.prim.ModelCache();
-
-        // TODO: to constructor
-        dispatcher = Dispatcher.get ();
+        
+        dispatcher = new Dispatcher ();
         settings = new Settings ();
-        entityFactory = new EntityFactory ();
-        level = new Level ();
-        hud = new Hud ();        
+
+        screens = new Map<String, Screen> ();
 
         instance = this;
     }
 
     /**
-     *  Init objects
+     *  Register screen
+     *  @param name - 
+     *  @param screen - 
      */
-    @:allow(app.BomberApp)
-    function init () : Void {
-        settings.init ();
-        level.init ();
-        hud.init ();
+    public function registerScreen (name : String, screen : Screen) : Void {
+        screens[name] = screen;
+    }
+
+    /**
+     *  Start screen
+     *  @param name - 
+     */
+    public function startScreen (name : String) : Void {
+        if (screen != null) screen.onLeave ();
+        screen = screens[name];
+        if (screen == null) return;
+        screen.onEnter ();
     }
 }

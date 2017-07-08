@@ -65,7 +65,7 @@ class NotifierMacro {
                 var setFunc:Function = {
                     expr: macro {
                         $e{value} = value;
-                        dispatch.Dispatcher.get ().notify ($v{fullName}, value);
+                        app.GameContext.get ().dispatcher.notify ($v{fullName}, value);
                         return $e{value};
                     },
                     ret: (ct),

@@ -44,6 +44,6 @@ class DestructableWall extends StaticEntity {
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
-        ctx.level.removeEntity (this);
+        level.removeEntity (this);
     }
 }

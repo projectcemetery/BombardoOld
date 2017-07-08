@@ -51,10 +51,8 @@ class Bomb extends StaticEntity {
      */
     function createEmitter () : Void {
         parts = new h3d.parts.GpuParticles();
-        ctx.scene3d.addChild (parts);
-        parts.visible = false;
 
-        var g = new h3d.parts.GpuParticles.GpuPartGroup();        
+        var g = new h3d.parts.GpuParticles.GpuPartGroup();
         g.texture = hxd.Res.bombburn.toTexture ();
         g.emitMode = Cone;
 		g.emitAngle = 0.3;
@@ -89,19 +87,18 @@ class Bomb extends StaticEntity {
         model.scale (0.003);
         time = 0;        
         createEmitter ();
-
-        setOnUpdate (onUpdate);        
     }
 
     /**
      *  Start bomb timer
      */
-    public function startTimer () : Void {
+    public function startTimer () : Void {        
+        ctx.scene3d.addChild (parts);
+        setOnUpdate (onUpdate);
         isArmed = true;
-        parts.visible = true;
         parts.x = model.x + 0.01;
         parts.y = model.y - 0.08;
-        parts.z = 1.1;
+        parts.z = 1.1;        
 
         var lifetime = ctx.settings.player.beforeBoom;
         var boomLength = ctx.settings.player.bombBoomLength;
@@ -114,17 +111,17 @@ class Bomb extends StaticEntity {
 
             // If wall on the way then returns true
             inline function process (px : Int, py : Int) : Bool {
-                if (ctx.level.isWall (px, py)) return true;
-                var entity = ctx.level.getEntity (px, py);                
+                if (level.isWall (px, py)) return true;
+                var entity = level.getEntity (px, py);
                 if (entity != null) entity.onHit ();
-                var expl = ctx.entityFactory.recycleExplosion ();
-                ctx.level.placeEntity (px, py, expl);
+                var expl = level.recycleExplosion ();
+                level.placeEntity (px, py, expl);
                 expl.startTimer ();
                 return false;
             }
 
             var pos = getPos ();
-            var mapPos = ctx.level.getMapPos (pos.x, pos.y);
+            var mapPos = level.getMapPos (pos.x, pos.y);
             process (mapPos.x, mapPos.y);
             for (i in 0...boomLength - 1) {
                 var x = mapPos.x + (i + 1);
@@ -145,7 +142,7 @@ class Bomb extends StaticEntity {
             }
 
             if (onBoom != null) onBoom ();
-            ctx.level.removeEntity (this);
+            level.removeEntity (this);
         });
     }
 
@@ -154,6 +151,8 @@ class Bomb extends StaticEntity {
      */
     override public function onDispose () : Void {
         super.onDispose ();
-        if (parts != null) parts.remove ();
+        if (parts != null) {
+            ctx.scene3d.removeChild (parts);
+        }
     }
 }
