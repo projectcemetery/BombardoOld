@@ -2,8 +2,6 @@ package app;
 
 import dispatch.Dispatcher;
 import settings.Settings;
-import map.Level;
-import gui.Hud;
 import screen.Screen;
 import scene.Scene3d;
 
@@ -77,9 +75,9 @@ class GameContext {
     @:allow(app.BomberApp)
     function new (app : hxd.App) {        
         engine = app.engine;
-        scene2d = app.s2d;
-        scene3d = new Scene3d (app.s3d);
+        scene2d = app.s2d;        
         waitEvent = new hxd.WaitEvent ();
+        scene3d = new Scene3d (app.s3d, waitEvent);
         modelCache = new h3d.prim.ModelCache();
         
         dispatcher = new Dispatcher ();

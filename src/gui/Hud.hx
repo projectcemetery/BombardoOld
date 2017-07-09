@@ -131,7 +131,7 @@ class Hud extends Gui {
         var bombTile = hxd.Res.hbomb.toTile();
         bombImage = new h2d.Bitmap(bombTile, this);
 
-        var btxt = new h2d.Text(font, bombImage);		
+        var btxt = new h2d.Text(font, bombImage);
 		btxt.textColor = 0x000000;
         btxt.x = bombImage.getSize ().xMax - 24;        
         btxt.y = 5;

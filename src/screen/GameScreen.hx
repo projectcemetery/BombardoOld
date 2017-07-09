@@ -50,6 +50,7 @@ class GameScreen extends Screen {
     override public function onEnter () : Void {
         level = new Level ();
         hud = new Hud ();
+        hud.init ();
         gameOverDialog = new GameOverDialog ();        
         gameOverDialog.onRestart = function () {
             gameOverDialog.hide ();
