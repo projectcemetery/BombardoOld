@@ -47,11 +47,11 @@ class GameScreen extends Screen {
     /**
      *  On enter screen
      */
-    override public function onEnter () : Void {
+    override public function onEnter () : Void {        
         level = new Level ();
         hud = new Hud ();
         hud.init ();
-        gameOverDialog = new GameOverDialog ();        
+        gameOverDialog = new GameOverDialog ();
         gameOverDialog.onRestart = function () {
             gameOverDialog.hide ();
             restart ();
@@ -64,6 +64,13 @@ class GameScreen extends Screen {
      */
     public function onMobKilled () : Void {
         ctx.settings.player.score += 5;
+    }
+
+    /**
+     *  On wall destroyed
+     */
+    public function onWallDesctroyed () : Void {
+        ctx.settings.player.score += 1;
     }
 
     /**

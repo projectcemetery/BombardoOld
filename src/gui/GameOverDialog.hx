@@ -33,6 +33,11 @@ class GameOverDialog extends Sprite {
     var cursorPoint : Point;
 
     /**
+     *  Text for player score
+     */
+    var scoreTxt : h2d.Text;
+
+    /**
      *  Callback then restart button pressed
      */
     public var onRestart : Void -> Void;
@@ -42,6 +47,11 @@ class GameOverDialog extends Sprite {
      */
     function onUpdate (dt : Float) : Bool {
         if (!visible) return true;
+        
+        if (dialogImage.y < 0) {
+            dialogImage.y += 30;
+        }
+
         if (hxd.Key.isPressed (hxd.Key.MOUSE_LEFT)) {
             cursorPoint.x = ctx.scene2d.mouseX;
             cursorPoint.y = ctx.scene2d.mouseY;                
@@ -59,14 +69,20 @@ class GameOverDialog extends Sprite {
         super ();
 
         ctx = GameContext.get ();
-        //var font = hxd.Res.trueTypeFont.build(24);            
+        var font = hxd.Res.trueTypeFont.build(36);
         var tile = hxd.Res.gameover.toTile ();
+        trace (tile.height);
         dialogImage = new Bitmap (tile, this);    
+
+        scoreTxt = new h2d.Text(font, dialogImage);
+		scoreTxt.textColor = 0xFFFFFF;
+        scoreTxt.x = 200;
+        scoreTxt.y = tile.height - 125;
 
         var buttonTile = hxd.Res.retrybutton.toTile ();
         retryButton = new Bitmap (buttonTile, dialogImage);
         retryButton.x = (tile.width / 2) - buttonTile.width / 2;
-        retryButton.y = tile.height - buttonTile.height + 10;        
+        retryButton.y = tile.height - buttonTile.height + 10;
 
         ctx.scene2d.addChild (this);
         this.visible = false;
@@ -81,7 +97,10 @@ class GameOverDialog extends Sprite {
     public function show () : Void {
         if (visible) return;
         visible = true;
+        scoreTxt.text = Std.string (ctx.settings.player.score);
         ctx.waitEvent.waitUntil (onUpdate);
+        var height = dialogImage.getBounds ().height;        
+        dialogImage.y = -height;
     }
 
     /**

@@ -44,6 +44,7 @@ class DestructableWall extends StaticEntity {
      *  On entity hit, by bombs or something else
      */
     override public function onHit () : Void {
+        gameScreen.onWallDesctroyed ();
         level.removeEntity (this);
     }
 }

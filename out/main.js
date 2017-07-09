@@ -1328,6 +1328,7 @@ ent_DestructableWall.__name__ = ["ent","DestructableWall"];
 ent_DestructableWall.__super__ = ent_StaticEntity;
 ent_DestructableWall.prototype = $extend(ent_StaticEntity.prototype,{
 	onHit: function() {
+		this.gameScreen.onWallDesctroyed();
 		this.level.removeEntity(this);
 	}
 	,__class__: ent_DestructableWall
@@ -5705,16 +5706,26 @@ h2d_Sprite.prototype = {
 var gui_GameOverDialog = function() {
 	h2d_Sprite.call(this);
 	this.ctx = app_GameContext.get();
+	var font = hxd_Res.get_loader().loadFont("trueTypeFont.ttf").build(36);
 	var tile = hxd_Res.get_loader().loadImage("gameover.png").toTile();
+	haxe_Log.trace(tile.height,{ fileName : "GameOverDialog.hx", lineNumber : 74, className : "gui.GameOverDialog", methodName : "new"});
 	this.dialogImage = new h2d_Bitmap(tile,this);
+	this.scoreTxt = new h2d_Text(font,this.dialogImage);
+	this.scoreTxt.set_textColor(16777215);
+	var _this = this.scoreTxt;
+	_this.posChanged = true;
+	_this.x = 200;
+	var _this1 = this.scoreTxt;
+	_this1.posChanged = true;
+	_this1.y = tile.height - 125;
 	var buttonTile = hxd_Res.get_loader().loadImage("retrybutton.png").toTile();
 	this.retryButton = new h2d_Bitmap(buttonTile,this.dialogImage);
-	var _this = this.retryButton;
-	_this.posChanged = true;
-	_this.x = tile.width / 2 - buttonTile.width / 2;
-	var _this1 = this.retryButton;
-	_this1.posChanged = true;
-	_this1.y = tile.height - buttonTile.height + 10;
+	var _this2 = this.retryButton;
+	_this2.posChanged = true;
+	_this2.x = tile.width / 2 - buttonTile.width / 2;
+	var _this3 = this.retryButton;
+	_this3.posChanged = true;
+	_this3.y = tile.height - buttonTile.height + 10;
 	this.ctx.scene2d.addChild(this);
 	this.set_visible(false);
 	this.posChanged = true;
@@ -5729,10 +5740,16 @@ gui_GameOverDialog.prototype = $extend(h2d_Sprite.prototype,{
 	,dialogImage: null
 	,retryButton: null
 	,cursorPoint: null
+	,scoreTxt: null
 	,onRestart: null
 	,onUpdate: function(dt) {
 		if(!this.visible) {
 			return true;
+		}
+		if(this.dialogImage.y < 0) {
+			var _g = this.dialogImage;
+			_g.posChanged = true;
+			_g.y += 30;
 		}
 		if(hxd_Key.isPressed(0)) {
 			this.cursorPoint.x = this.ctx.scene2d.get_mouseX();
@@ -5752,7 +5769,13 @@ gui_GameOverDialog.prototype = $extend(h2d_Sprite.prototype,{
 			return;
 		}
 		this.set_visible(true);
+		this.scoreTxt.set_text(Std.string(this.ctx.settings.player._score));
 		this.ctx.waitEvent.waitUntil($bind(this,this.onUpdate));
+		var _this = this.dialogImage.getBounds();
+		var height = _this.yMax - _this.yMin;
+		var _this1 = this.dialogImage;
+		_this1.posChanged = true;
+		_this1.y = -height;
 	}
 	,hide: function() {
 		this.set_visible(false);
@@ -54910,6 +54933,12 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 	,onMobKilled: function() {
 		var _g = this.ctx.settings.player;
 		var value = _g._score + 5;
+		_g._score = value;
+		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",value);
+	}
+	,onWallDesctroyed: function() {
+		var _g = this.ctx.settings.player;
+		var value = _g._score + 1;
 		_g._score = value;
 		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",value);
 	}
