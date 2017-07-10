@@ -106,7 +106,7 @@ class MovingEntity extends LevelEntity {
             }
         }        
 
-        if (onCollisionInternal != null) onCollisionInternal (colCompl);
+        if (onCollisionInternal != null && colCompl.length > 0) onCollisionInternal (colCompl);
         if (onMoveCompleteInternal != null) onMoveCompleteInternal (cdx, cdy);
     }
 }

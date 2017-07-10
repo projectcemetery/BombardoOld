@@ -71,7 +71,6 @@ class GameOverDialog extends Sprite {
         ctx = GameContext.get ();
         var font = hxd.Res.trueTypeFont.build(36);
         var tile = hxd.Res.gameover.toTile ();
-        trace (tile.height);
         dialogImage = new Bitmap (tile, this);    
 
         scoreTxt = new h2d.Text(font, dialogImage);
@@ -88,7 +87,7 @@ class GameOverDialog extends Sprite {
         this.visible = false;
         this.x = (ctx.scene2d.width / 2) - tile.width / 2;
 
-        cursorPoint = new Point ();        
+        cursorPoint = new Point ();
     }
 
     /**

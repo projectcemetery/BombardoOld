@@ -34,12 +34,9 @@ class Hud extends Gui {
     var scoreTxt : h2d.Text;
 
     /**
-     *  Bomb count that player can place
+     *  Bomb count text
      */
-    public var bombCount (default, set) : Int;    
-    function set_bombCount (v : Int) : Int {
-        return 0;
-    }
+    var bombCounttxt : h2d.Text;
 
     /**
      *  Draw call text
@@ -68,6 +65,14 @@ class Hud extends Gui {
      */
     function setScore (v : Int) : Void {
         scoreTxt.text = Std.string (v);
+    }
+
+    /**
+     *  Set player bomb count
+     *  @param v - 
+     */
+    function setBombCount (v : Int) : Void {
+        bombCounttxt.text = Std.string (v);
     }
 
     /**
@@ -131,11 +136,11 @@ class Hud extends Gui {
         var bombTile = hxd.Res.hbomb.toTile();
         bombImage = new h2d.Bitmap(bombTile, this);
 
-        var btxt = new h2d.Text(font, bombImage);
-		btxt.textColor = 0x000000;
-        btxt.x = bombImage.getSize ().xMax - 24;        
-        btxt.y = 5;
-        btxt.text = Std.string (ctx.settings.player.maxBombCount);
+        bombCounttxt = new h2d.Text(font, bombImage);
+		bombCounttxt.textColor = 0x000000;
+        bombCounttxt.x = bombImage.getSize ().xMax - 24;        
+        bombCounttxt.y = 5;
+        bombCounttxt.text = Std.string (ctx.settings.player.maxBombCount);
 
         var explosionTile = hxd.Res.hexplosion.toTile();
         explosionImage = new h2d.Bitmap(explosionTile, this);
@@ -164,6 +169,10 @@ class Hud extends Gui {
 
         ctx.dispatcher.addHandler (settings.PlayerSettings.SCORE, function (e) {
             setScore (e);
+        });
+
+        ctx.dispatcher.addHandler (settings.PlayerSettings.MAXBOMBCOUNT, function (e) {
+            setBombCount (e);
         });
 
         ctx.waitEvent.waitUntil (onUpdate);

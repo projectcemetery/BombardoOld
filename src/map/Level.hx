@@ -15,6 +15,7 @@ import ent.Bomb;
 import ent.DestructableWall;
 import ent.Explosion;
 import ent.Mob;
+import ent.PowerUp;
 
 /**
  *  Game level
@@ -205,7 +206,7 @@ class Level {
     /**
      *  Place mobs in map
      */
-    function placeMobs () {        
+    function placeMobs () {
         for (p in mobSpawnPoints) {
             var mob = recicleMob ();
             placeEntity (p.x, p.y, mob);
@@ -218,9 +219,11 @@ class Level {
      *  @param y - 
      *  @param entity - 
      */
-    function placeCellEntity (x : Float, y : Float, entity : Entity) : Void {        
+    function placeCellEntity (x : Float, y : Float, entity : StaticEntity) : Void {
         var mapPos = getMapPos (x, y);
         var pos = mapPos.y * mapWidth + mapPos.x;
+        entity.mapX = mapPos.x;
+        entity.mapY = mapPos.y;
         cellEntities[pos] = entity;
         ctx.scene3d.addChild (entity.model);
         entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
@@ -445,6 +448,14 @@ class Level {
         return new DestructableWall ();
     }
 
+    /**
+     *  Recycle powerup
+     *  @return PowerUp
+     */
+    public function recyclePowerUp () : PowerUp {
+        return new PowerUp ();
+    }
+
      /**
      *  Init after create
      */
@@ -515,7 +526,7 @@ class Level {
      */
     public function placeEntity (x : Float, y : Float, entity : Entity) : Void {
         if (Std.is (entity, StaticEntity)) {
-            placeCellEntity (x, y, entity);
+            placeCellEntity (x, y, cast entity);
         } else {
             placeMoveEntity (x, y, entity);
         }

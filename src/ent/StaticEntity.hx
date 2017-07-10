@@ -5,4 +5,13 @@ package ent;
  */
 class StaticEntity extends LevelEntity {
 
+    /**
+     *  Map x
+     */
+    public var mapX : Int;
+
+    /**
+     *  Map y
+     */
+    public var mapY : Int;
 }

@@ -105,6 +105,19 @@ class Player extends MovingEntity {
     }
 
     /**
+     *  On collision
+     *  @param cols - 
+     */
+    function onCollision (cols : Array<CollisionInfo>) : Void {
+        for (c in cols) {
+            if (c.entity2 != null && Std.is (c.entity2, PowerUp)) {
+                c.entity2.onHit ();
+                gameScreen.onPowerUp (cast c.entity2);
+            }
+        }
+    }
+
+    /**
      *  Constructor
      */
     public function new  () {
@@ -125,6 +138,7 @@ class Player extends MovingEntity {
         isDisposed = false;
         
         setOnFilterCollision (onFilterCollision);
+        setOnCollision (onCollision);
         setOnMoveComplete (onMoveComplete);
         setOnUpdate (onUpdate);
     }

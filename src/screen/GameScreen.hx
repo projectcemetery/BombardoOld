@@ -4,6 +4,7 @@ import gui.Hud;
 import gui.GameOverDialog;
 import map.Level;
 import ent.Player;
+import ent.PowerUp;
 
 /**
  *  Game controller
@@ -47,7 +48,7 @@ class GameScreen extends Screen {
     /**
      *  On enter screen
      */
-    override public function onEnter () : Void {        
+    override public function onEnter () : Void {
         level = new Level ();
         hud = new Hud ();
         hud.init ();
@@ -60,6 +61,14 @@ class GameScreen extends Screen {
     }
 
     /**
+     *  When player get power up
+     *  @param e - 
+     */
+    public function onPowerUp (e : PowerUp) : Void {
+        ctx.settings.player.maxBombCount += 1;
+    }
+
+    /**
      *  Notify that mob was killed
      */
     public function onMobKilled () : Void {
@@ -69,8 +78,11 @@ class GameScreen extends Screen {
     /**
      *  On wall destroyed
      */
-    public function onWallDesctroyed () : Void {
+    public function onWallDesctroyed (x : Int, y : Int) : Void {
         ctx.settings.player.score += 1;
+        
+        var poverUp = level.recyclePowerUp ();
+        level.placeEntity (x, y, poverUp);
     }
 
     /**
