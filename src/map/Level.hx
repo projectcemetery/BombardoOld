@@ -110,7 +110,7 @@ class Level {
     /**
      *  Static entities that does not move from cell
      */
-    var cellEntities = new Map<Int, Entity> ();
+    var cellEntities = new Map<Int, Array<Entity>> ();
 
     /**
      *  Moving entities
@@ -224,7 +224,12 @@ class Level {
         var pos = mapPos.y * mapWidth + mapPos.x;
         entity.mapX = mapPos.x;
         entity.mapY = mapPos.y;
-        cellEntities[pos] = entity;
+        var entArr = cellEntities[pos];
+        if (entArr == null) {
+            entArr = new Array<Entity> ();
+            cellEntities[pos] = entArr;
+        }
+        entArr.push (entity);
         ctx.scene3d.addChild (entity.model);
         entity.setPos (mapPos.x + 0.5, mapPos.y + 0.5);
     }
@@ -237,7 +242,11 @@ class Level {
         var ps = entity.getPos ();
         var mapPos = getMapPos (ps.x, ps.y);
         var pos = mapPos.y * mapWidth + mapPos.x;
-        cellEntities.remove (pos);
+        var entArr = cellEntities[pos];
+        if (entArr != null) {
+            entArr.remove (entity);
+            if (entArr.length < 1) cellEntities.remove (pos);
+        }
         ctx.scene3d.removeChild (entity.model);
     }
 
@@ -248,7 +257,7 @@ class Level {
      *  @param y - 
      *  @return Entity
      */
-    function getCellEntity (x : Int, y : Int) : Entity {
+    function getCellEntity (x : Int, y : Int) : Array<Entity> {
         var pos = y * mapWidth + x;
         return cellEntities[pos];
     }
@@ -282,52 +291,52 @@ class Level {
      *  @param bounds - 
      *  @param side - 
      */
-    function isEntityCollide (entity : Entity, bounds : Bounds, side : Side, ?except : Entity) : Entity {        
-        inline function checkTopLeft () : Entity {
+    function isEntityCollide (entity : Entity, bounds : Bounds, side : Side, ?except : Entity) : Array<Entity> {        
+        inline function checkTopLeft () : Array<Entity> {
             var topY = Std.int (bounds.yMin);
             var leftX = Std.int (bounds.xMin);
             return getEntity (leftX, topY);            
         }
 
-        inline function checkTopRight () : Entity {
+        inline function checkTopRight () : Array<Entity> {
             var topY = Std.int (bounds.yMin);
             var rightX = Std.int (bounds.xMax);
             return getEntity (rightX, topY);            
         }
 
-        inline function checkBottomRight () : Entity {
+        inline function checkBottomRight () : Array<Entity> {
             var bottomY = Std.int (bounds.yMax);
             var rightX = Std.int (bounds.xMax);
             return getEntity (rightX, bottomY);            
         }
         
-        inline function checkBottomLeft () : Entity {
+        inline function checkBottomLeft () : Array<Entity> {
             var bottomY = Std.int (bounds.yMax);
             var leftX = Std.int (bounds.xMin);
             return getEntity (leftX, bottomY);
         }
 
-        var ent : Entity = null;
+        var entArr : Array<Entity> = null;
 
         switch (side) {
             case Side.Top:
-                ent = checkTopLeft ();
-                if (ent == null) ent = checkTopRight ();
+                entArr = checkTopLeft ();
+                if (entArr == null) entArr = checkTopRight ();
             case Side.Right:
-                ent = checkTopRight ();
-                if (ent == null) ent = checkBottomRight ();
+                entArr = checkTopRight ();
+                if (entArr == null) entArr = checkBottomRight ();
             case Side.Bottom:
-                ent = checkBottomRight ();
-                if (ent == null) ent = checkBottomLeft ();
+                entArr = checkBottomRight ();
+                if (entArr == null) entArr = checkBottomLeft ();
             case Side.Left:
-                ent = checkBottomLeft ();
-                if (ent == null) ent = checkTopLeft ();
+                entArr = checkBottomLeft ();
+                if (entArr == null) entArr = checkTopLeft ();
             default: {}
         }
-
-        if (except != null && ent == except) return null;
-        if ((ent != null) && (ent != entity)) return ent;
-        return null;
+        if (entArr == null || entArr.length < 1) return null;
+        entArr.remove (entity);
+        if (except != null) entArr.remove (except);
+        return if (entArr == null || entArr.length < 1) return null else return entArr;
     }
 
     /**
@@ -469,9 +478,11 @@ class Level {
         wallMap = new Map<Int, Bounds> ();
 
         var entities = new Array<Entity> ();
-        for (e in cellEntities) entities.push (e);
+        for (cells in cellEntities) {
+            for (e in cells) entities.push (e);
+        }
         for (e in entities) removeEntity (e);
-        cellEntities = new Map<Int, Entity> ();        
+        cellEntities = new Map<Int, Array<Entity>> ();        
                 
         for (e in moveEntities) entities.push (e);
         for (e in entities) removeEntity (e);
@@ -533,24 +544,29 @@ class Level {
     }
 
     /**
-     *  Get entity from map
+     *  Get entities from map
      *  @param x - 
      *  @param y - 
      *  @return Entity
      */
-    public function getEntity (x : Float, y : Float) : Entity {
+    public function getEntity (x : Float, y : Float) : Array<Entity> {
+        var res = [];
         var mapPos = getMapPos (x, y);
         for (e in moveEntities) {
             var ps = e.getPos ();
             var mps = getMapPos (ps.x, ps.y);
 
-            if ((mps.x == mapPos.x) && (mps.y == mapPos.y)) return e;
+            if ((mps.x == mapPos.x) && (mps.y == mapPos.y)) {
+                res.push (e);
+            }
         }
         
         var ce = getCellEntity (mapPos.x, mapPos.y);
-        if (ce != null) return ce;
+        if (ce != null) {
+            for (e in ce) res.push (e);
+        }
 
-        return null;
+        return if (res.length < 1) return null else return res;
     }
 
     /**
@@ -594,10 +610,9 @@ class Level {
                 continue;
             }
 
-            var ent = isEntityCollide (b.entity1, b.bounds, b.side, b.exceptEntity);
-
-            if (ent != null) {
-                b.entity2 = ent;
+            var entArr = isEntityCollide (b.parentEntity, b.bounds, b.side, b.exceptEntity);
+            if (entArr != null && entArr.length > 0) {
+                b.entities = entArr;
                 b.isCollide = true;
             }
         }

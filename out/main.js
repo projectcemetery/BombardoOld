@@ -1171,6 +1171,125 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 		this.group = g;
 		this.parts.addGroup(g);
 	}
+	,boom: function() {
+		var _gthis = this;
+		this.level.removeEntity(this);
+		var boomLength = this.ctx.settings.player.bombBoomLength;
+		var wallLeft = false;
+		var wallRight = false;
+		var wallTop = false;
+		var wallBottom = false;
+		var pos = this.getPos();
+		var mapPos = this.level.getMapPos(pos.x,pos.y);
+		var px = mapPos.x;
+		var py = mapPos.y;
+		if(!_gthis.level.isWall(px,py)) {
+			var entArr = _gthis.level.getEntity(px,py);
+			if(entArr != null) {
+				var _g = 0;
+				while(_g < entArr.length) {
+					var entity = entArr[_g];
+					++_g;
+					entity.onHit();
+				}
+			}
+			var expl = _gthis.level.recycleExplosion();
+			_gthis.level.placeEntity(px,py,expl);
+			expl.startTimer();
+		}
+		var _g1 = 0;
+		var _g2 = boomLength - 1;
+		while(_g1 < _g2) {
+			var i = _g1++;
+			var x = mapPos.x + (i + 1);
+			var y = mapPos.y;
+			if(!wallRight) {
+				if(_gthis.level.isWall(x,y)) {
+					wallRight = true;
+				} else {
+					var entArr1 = _gthis.level.getEntity(x,y);
+					if(entArr1 != null) {
+						var _g3 = 0;
+						while(_g3 < entArr1.length) {
+							var entity1 = entArr1[_g3];
+							++_g3;
+							entity1.onHit();
+						}
+					}
+					var expl1 = _gthis.level.recycleExplosion();
+					_gthis.level.placeEntity(x,y,expl1);
+					expl1.startTimer();
+					wallRight = false;
+				}
+			}
+			x = mapPos.x - (i + 1);
+			y = mapPos.y;
+			if(!wallLeft) {
+				if(_gthis.level.isWall(x,y)) {
+					wallLeft = true;
+				} else {
+					var entArr2 = _gthis.level.getEntity(x,y);
+					if(entArr2 != null) {
+						var _g4 = 0;
+						while(_g4 < entArr2.length) {
+							var entity2 = entArr2[_g4];
+							++_g4;
+							entity2.onHit();
+						}
+					}
+					var expl2 = _gthis.level.recycleExplosion();
+					_gthis.level.placeEntity(x,y,expl2);
+					expl2.startTimer();
+					wallLeft = false;
+				}
+			}
+			x = mapPos.x;
+			y = mapPos.y + (i + 1);
+			if(!wallBottom) {
+				if(_gthis.level.isWall(x,y)) {
+					wallBottom = true;
+				} else {
+					var entArr3 = _gthis.level.getEntity(x,y);
+					if(entArr3 != null) {
+						var _g5 = 0;
+						while(_g5 < entArr3.length) {
+							var entity3 = entArr3[_g5];
+							++_g5;
+							entity3.onHit();
+						}
+					}
+					var expl3 = _gthis.level.recycleExplosion();
+					_gthis.level.placeEntity(x,y,expl3);
+					expl3.startTimer();
+					wallBottom = false;
+				}
+			}
+			x = mapPos.x;
+			y = mapPos.y - (i + 1);
+			if(!wallTop) {
+				if(_gthis.level.isWall(x,y)) {
+					wallTop = true;
+				} else {
+					var entArr4 = _gthis.level.getEntity(x,y);
+					if(entArr4 != null) {
+						var _g6 = 0;
+						while(_g6 < entArr4.length) {
+							var entity4 = entArr4[_g6];
+							++_g6;
+							entity4.onHit();
+						}
+					}
+					var expl4 = _gthis.level.recycleExplosion();
+					_gthis.level.placeEntity(x,y,expl4);
+					expl4.startTimer();
+					wallTop = false;
+				}
+			}
+		}
+		if(this.onBoom != null) {
+			this.onBoom();
+		}
+	}
 	,startTimer: function() {
 		var _gthis = this;
 		this.ctx.scene3d.addChild(this.parts);
@@ -1206,98 +1325,8 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 			_this2.flags &= ~f2;
 		}
 		var lifetime = this.ctx.settings.player.beforeBoom;
-		var boomLength = this.ctx.settings.player.bombBoomLength;
 		this.ctx.waitEvent.wait(lifetime,function() {
-			var wallLeft = false;
-			var wallRight = false;
-			var wallTop = false;
-			var wallBottom = false;
-			var pos = _gthis.getPos();
-			var mapPos = _gthis.level.getMapPos(pos.x,pos.y);
-			var px = mapPos.x;
-			var py = mapPos.y;
-			if(!_gthis.level.isWall(px,py)) {
-				var entity = _gthis.level.getEntity(px,py);
-				if(entity != null) {
-					entity.onHit();
-				}
-				var expl = _gthis.level.recycleExplosion();
-				_gthis.level.placeEntity(px,py,expl);
-				expl.startTimer();
-			}
-			var _g1 = 0;
-			var _g = boomLength - 1;
-			while(_g1 < _g) {
-				var i = _g1++;
-				var x = mapPos.x + (i + 1);
-				var y = mapPos.y;
-				if(!wallRight) {
-					if(_gthis.level.isWall(x,y)) {
-						wallRight = true;
-					} else {
-						var entity1 = _gthis.level.getEntity(x,y);
-						if(entity1 != null) {
-							entity1.onHit();
-						}
-						var expl1 = _gthis.level.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl1);
-						expl1.startTimer();
-						wallRight = false;
-					}
-				}
-				x = mapPos.x - (i + 1);
-				y = mapPos.y;
-				if(!wallLeft) {
-					if(_gthis.level.isWall(x,y)) {
-						wallLeft = true;
-					} else {
-						var entity2 = _gthis.level.getEntity(x,y);
-						if(entity2 != null) {
-							entity2.onHit();
-						}
-						var expl2 = _gthis.level.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl2);
-						expl2.startTimer();
-						wallLeft = false;
-					}
-				}
-				x = mapPos.x;
-				y = mapPos.y + (i + 1);
-				if(!wallBottom) {
-					if(_gthis.level.isWall(x,y)) {
-						wallBottom = true;
-					} else {
-						var entity3 = _gthis.level.getEntity(x,y);
-						if(entity3 != null) {
-							entity3.onHit();
-						}
-						var expl3 = _gthis.level.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl3);
-						expl3.startTimer();
-						wallBottom = false;
-					}
-				}
-				x = mapPos.x;
-				y = mapPos.y - (i + 1);
-				if(!wallTop) {
-					if(_gthis.level.isWall(x,y)) {
-						wallTop = true;
-					} else {
-						var entity4 = _gthis.level.getEntity(x,y);
-						if(entity4 != null) {
-							entity4.onHit();
-						}
-						var expl4 = _gthis.level.recycleExplosion();
-						_gthis.level.placeEntity(x,y,expl4);
-						expl4.startTimer();
-						wallTop = false;
-					}
-				}
-			}
-			if(_gthis.onBoom != null) {
-				_gthis.onBoom();
-			}
-			_gthis.level.removeEntity(_gthis);
+			_gthis.boom();
 		});
 	}
 	,onDispose: function() {
@@ -1305,6 +1334,9 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 		if(this.parts != null) {
 			this.ctx.scene3d.removeChild(this.parts);
 		}
+	}
+	,onHit: function() {
+		this.boom();
 	}
 	,__class__: ent_Bomb
 });
@@ -1450,7 +1482,7 @@ ent_MovingEntity.prototype = $extend(ent_LevelEntity.prototype,{
 			b.zMax = bounds.zMax;
 			var b1 = b;
 			b1.xMax += dx;
-			cols.push({ entity1 : this, side : col_Side.Right, bounds : b1});
+			cols.push({ parentEntity : this, side : col_Side.Right, bounds : b1});
 		} else if(dx < 0) {
 			var b2 = new h3d_col_Bounds();
 			b2.xMin = bounds.xMin;
@@ -1461,7 +1493,7 @@ ent_MovingEntity.prototype = $extend(ent_LevelEntity.prototype,{
 			b2.zMax = bounds.zMax;
 			var b3 = b2;
 			b3.xMin += dx;
-			cols.push({ entity1 : this, side : col_Side.Left, bounds : b3});
+			cols.push({ parentEntity : this, side : col_Side.Left, bounds : b3});
 		}
 		if(dy > 0) {
 			var b4 = new h3d_col_Bounds();
@@ -1473,7 +1505,7 @@ ent_MovingEntity.prototype = $extend(ent_LevelEntity.prototype,{
 			b4.zMax = bounds.zMax;
 			var b5 = b4;
 			b5.yMax += dy;
-			cols.push({ entity1 : this, side : col_Side.Bottom, bounds : b5});
+			cols.push({ parentEntity : this, side : col_Side.Bottom, bounds : b5});
 		} else if(dy < 0) {
 			var b6 = new h3d_col_Bounds();
 			b6.xMin = bounds.xMin;
@@ -1484,7 +1516,7 @@ ent_MovingEntity.prototype = $extend(ent_LevelEntity.prototype,{
 			b6.zMax = bounds.zMax;
 			var b7 = b6;
 			b7.yMin += dy;
-			cols.push({ entity1 : this, side : col_Side.Top, bounds : b7});
+			cols.push({ parentEntity : this, side : col_Side.Top, bounds : b7});
 		}
 		cols = this.level.isCollide(cols);
 		var cdx = 0.0;
@@ -1499,67 +1531,81 @@ ent_MovingEntity.prototype = $extend(ent_LevelEntity.prototype,{
 					c.isCollide = false;
 				}
 			}
-			if(c.entity2 != null && c.entity2.onCollisionInternal != null) {
-				c.entity2.onCollisionInternal([c]);
+			var isObstacle = true;
+			if(c.entities != null) {
+				var isOb = false;
+				var _g1 = 0;
+				var _g2 = c.entities;
+				while(_g1 < _g2.length) {
+					var ent1 = _g2[_g1];
+					++_g1;
+					if(ent1.onCollisionInternal != null) {
+						ent1.onCollisionInternal([c]);
+					}
+					if(!isOb && ent1.isObstacle) {
+						isOb = true;
+					}
+				}
+				isObstacle = isOb;
 			}
-			if(!c.isCollide || c.entity2 != null && !c.entity2.isObstacle) {
-				var _g1 = c.side;
-				switch(_g1[1]) {
+			if(!c.isCollide || !isObstacle) {
+				var _g11 = c.side;
+				switch(_g11[1]) {
 				case 0:
-					var _g11 = this.model;
-					var v = _g11.y + dy;
-					_g11.y = v;
+					var _g12 = this.model;
+					var v = _g12.y + dy;
+					_g12.y = v;
 					var f = 1;
 					var b8 = true;
 					if(b8) {
-						_g11.flags |= f;
+						_g12.flags |= f;
 					} else {
-						_g11.flags &= ~f;
+						_g12.flags &= ~f;
 					}
 					bounds.yMin += dy;
 					bounds.yMax += dy;
 					cdy = dy;
 					break;
 				case 1:
-					var _g12 = this.model;
-					var v1 = _g12.x + dx;
-					_g12.x = v1;
+					var _g13 = this.model;
+					var v1 = _g13.x + dx;
+					_g13.x = v1;
 					var f1 = 1;
 					var b9 = true;
 					if(b9) {
-						_g12.flags |= f1;
+						_g13.flags |= f1;
 					} else {
-						_g12.flags &= ~f1;
+						_g13.flags &= ~f1;
 					}
 					bounds.xMin += dx;
 					bounds.xMax += dx;
 					cdx = dx;
 					break;
 				case 2:
-					var _g13 = this.model;
-					var v2 = _g13.y + dy;
-					_g13.y = v2;
+					var _g14 = this.model;
+					var v2 = _g14.y + dy;
+					_g14.y = v2;
 					var f2 = 1;
 					var b10 = true;
 					if(b10) {
-						_g13.flags |= f2;
+						_g14.flags |= f2;
 					} else {
-						_g13.flags &= ~f2;
+						_g14.flags &= ~f2;
 					}
 					bounds.yMin += dy;
 					bounds.yMax += dy;
 					cdy = dy;
 					break;
 				case 3:
-					var _g14 = this.model;
-					var v3 = _g14.x + dx;
-					_g14.x = v3;
+					var _g15 = this.model;
+					var v3 = _g15.x + dx;
+					_g15.x = v3;
 					var f3 = 1;
 					var b11 = true;
 					if(b11) {
-						_g14.flags |= f3;
+						_g15.flags |= f3;
 					} else {
-						_g14.flags &= ~f3;
+						_g15.flags &= ~f3;
 					}
 					bounds.xMin += dx;
 					bounds.xMax += dx;
@@ -1661,11 +1707,17 @@ ent_Mob.prototype = $extend(ent_MovingEntity.prototype,{
 			while(_g < cols.length) {
 				var c = cols[_g];
 				++_g;
-				if(js_Boot.__instanceof(c.entity1,ent_Player)) {
-					play = c.entity1;
-				}
-				if(js_Boot.__instanceof(c.entity2,ent_Player)) {
-					play = c.entity2;
+				if(c.entities != null) {
+					var _g1 = 0;
+					var _g2 = c.entities;
+					while(_g1 < _g2.length) {
+						var ent1 = _g2[_g1];
+						++_g1;
+						if(js_Boot.__instanceof(ent1,ent_Player)) {
+							play = ent1;
+							break;
+						}
+					}
 				}
 			}
 			if(play != null) {
@@ -1786,9 +1838,19 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		this.placedBomb.startTimer();
 	}
 	,onFilterCollision: function(c) {
-		if(this.placedBomb != null && c.entity2 == this.placedBomb) {
-			this.wasBombCollide = true;
-			return true;
+		if(this.placedBomb != null) {
+			if(c.entities != null) {
+				var _g = 0;
+				var _g1 = c.entities;
+				while(_g < _g1.length) {
+					var e = _g1[_g];
+					++_g;
+					if(e == this.placedBomb) {
+						this.wasBombCollide = true;
+						return true;
+					}
+				}
+			}
 		}
 		return false;
 	}
@@ -1810,24 +1872,34 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		if(hxd_Key.isDown(68)) {
 			dx = this.speed * dt;
 		}
+		if(hxd_Key.isPressed(32)) {
+			this.placeBomb();
+		}
+		if(dx < 0.001 && dx > -0.001 && (dy < 0.001 && dy > -0.001)) {
+			return;
+		}
 		this.wasBombCollide = false;
 		this.move(dx,dy);
 		if(!this.wasBombCollide) {
 			this.placedBomb = null;
 		}
-		if(hxd_Key.isPressed(32)) {
-			this.placeBomb();
-		}
 	}
 	,onCollision: function(cols) {
-		haxe_Log.trace(cols.length,{ fileName : "Player.hx", lineNumber : 112, className : "ent.Player", methodName : "onCollision"});
 		var _g = 0;
 		while(_g < cols.length) {
 			var c = cols[_g];
 			++_g;
-			if(c.entity2 != null && js_Boot.__instanceof(c.entity2,ent_PowerUp)) {
-				c.entity2.onHit();
-				this.gameScreen.onPowerUp(c.entity2);
+			if(c.entities != null) {
+				var _g1 = 0;
+				var _g2 = c.entities;
+				while(_g1 < _g2.length) {
+					var ent1 = _g2[_g1];
+					++_g1;
+					if(js_Boot.__instanceof(ent1,ent_PowerUp)) {
+						ent1.onHit();
+						this.gameScreen.onPowerUp(ent1);
+					}
+				}
 			}
 		}
 	}
@@ -54432,7 +54504,12 @@ map_Level.prototype = {
 		var pos = mapPos.y * this.mapWidth + mapPos.x;
 		entity.mapX = mapPos.x;
 		entity.mapY = mapPos.y;
-		this.cellEntities.h[pos] = entity;
+		var entArr = this.cellEntities.h[pos];
+		if(entArr == null) {
+			entArr = [];
+			this.cellEntities.h[pos] = entArr;
+		}
+		entArr.push(entity);
 		this.ctx.scene3d.addChild(entity.model);
 		entity.setPos(mapPos.x + 0.5,mapPos.y + 0.5);
 	}
@@ -54440,7 +54517,13 @@ map_Level.prototype = {
 		var ps = entity.getPos();
 		var mapPos = this.getMapPos(ps.x,ps.y);
 		var pos = mapPos.y * this.mapWidth + mapPos.x;
-		this.cellEntities.remove(pos);
+		var entArr = this.cellEntities.h[pos];
+		if(entArr != null) {
+			HxOverrides.remove(entArr,entity);
+			if(entArr.length < 1) {
+				this.cellEntities.remove(pos);
+			}
+		}
 		this.ctx.scene3d.removeChild(entity.model);
 	}
 	,getCellEntity: function(x,y) {
@@ -54459,56 +54542,61 @@ map_Level.prototype = {
 	}
 	,isEntityCollide: function(entity,bounds,side,except) {
 		var _gthis = this;
-		var ent = null;
+		var entArr = null;
 		switch(side[1]) {
 		case 0:
 			var topY = bounds.yMin | 0;
 			var leftX = bounds.xMin | 0;
-			ent = _gthis.getEntity(leftX,topY);
-			if(ent == null) {
+			entArr = _gthis.getEntity(leftX,topY);
+			if(entArr == null) {
 				var topY1 = bounds.yMin | 0;
 				var rightX = bounds.xMax | 0;
-				ent = _gthis.getEntity(rightX,topY1);
+				entArr = _gthis.getEntity(rightX,topY1);
 			}
 			break;
 		case 1:
 			var topY2 = bounds.yMin | 0;
 			var rightX1 = bounds.xMax | 0;
-			ent = _gthis.getEntity(rightX1,topY2);
-			if(ent == null) {
+			entArr = _gthis.getEntity(rightX1,topY2);
+			if(entArr == null) {
 				var bottomY = bounds.yMax | 0;
 				var rightX2 = bounds.xMax | 0;
-				ent = _gthis.getEntity(rightX2,bottomY);
+				entArr = _gthis.getEntity(rightX2,bottomY);
 			}
 			break;
 		case 2:
 			var bottomY1 = bounds.yMax | 0;
 			var rightX3 = bounds.xMax | 0;
-			ent = _gthis.getEntity(rightX3,bottomY1);
-			if(ent == null) {
+			entArr = _gthis.getEntity(rightX3,bottomY1);
+			if(entArr == null) {
 				var bottomY2 = bounds.yMax | 0;
 				var leftX1 = bounds.xMin | 0;
-				ent = _gthis.getEntity(leftX1,bottomY2);
+				entArr = _gthis.getEntity(leftX1,bottomY2);
 			}
 			break;
 		case 3:
 			var bottomY3 = bounds.yMax | 0;
 			var leftX2 = bounds.xMin | 0;
-			ent = _gthis.getEntity(leftX2,bottomY3);
-			if(ent == null) {
+			entArr = _gthis.getEntity(leftX2,bottomY3);
+			if(entArr == null) {
 				var topY3 = bounds.yMin | 0;
 				var leftX3 = bounds.xMin | 0;
-				ent = _gthis.getEntity(leftX3,topY3);
+				entArr = _gthis.getEntity(leftX3,topY3);
 			}
 			break;
 		}
-		if(except != null && ent == except) {
+		if(entArr == null || entArr.length < 1) {
 			return null;
 		}
-		if(ent != null && ent != entity) {
-			return ent;
+		HxOverrides.remove(entArr,entity);
+		if(except != null) {
+			HxOverrides.remove(entArr,except);
 		}
-		return null;
+		if(entArr == null || entArr.length < 1) {
+			return null;
+		} else {
+			return entArr;
+		}
 	}
 	,isWallCollide: function(bounds,side) {
 		var _gthis = this;
@@ -54617,30 +54705,35 @@ map_Level.prototype = {
 		this.mobSpawnPoints = [];
 		this.wallMap = new haxe_ds_IntMap();
 		var entities = [];
-		var e = this.cellEntities.iterator();
-		while(e.hasNext()) {
-			var e1 = e.next();
-			entities.push(e1);
+		var cells = this.cellEntities.iterator();
+		while(cells.hasNext()) {
+			var cells1 = cells.next();
+			var _g = 0;
+			while(_g < cells1.length) {
+				var e = cells1[_g];
+				++_g;
+				entities.push(e);
+			}
 		}
-		var _g = 0;
-		while(_g < entities.length) {
-			var e2 = entities[_g];
-			++_g;
-			this.removeEntity(e2);
+		var _g1 = 0;
+		while(_g1 < entities.length) {
+			var e1 = entities[_g1];
+			++_g1;
+			this.removeEntity(e1);
 		}
 		this.cellEntities = new haxe_ds_IntMap();
-		var _g1 = 0;
-		var _g11 = this.moveEntities;
-		while(_g1 < _g11.length) {
-			var e3 = _g11[_g1];
-			++_g1;
-			entities.push(e3);
-		}
 		var _g2 = 0;
-		while(_g2 < entities.length) {
-			var e4 = entities[_g2];
+		var _g11 = this.moveEntities;
+		while(_g2 < _g11.length) {
+			var e2 = _g11[_g2];
 			++_g2;
-			this.removeEntity(e4);
+			entities.push(e2);
+		}
+		var _g3 = 0;
+		while(_g3 < entities.length) {
+			var e3 = entities[_g3];
+			++_g3;
+			this.removeEntity(e3);
 		}
 		this.moveEntities = [];
 		this.ctx.scene3d.removeChild(this.levelMesh);
@@ -54688,6 +54781,7 @@ map_Level.prototype = {
 		}
 	}
 	,getEntity: function(x,y) {
+		var res = [];
 		var mapPos = this.getMapPos(x,y);
 		var _g = 0;
 		var _g1 = this.moveEntities;
@@ -54697,14 +54791,23 @@ map_Level.prototype = {
 			var ps = e.getPos();
 			var mps = this.getMapPos(ps.x,ps.y);
 			if(mps.x == mapPos.x && mps.y == mapPos.y) {
-				return e;
+				res.push(e);
 			}
 		}
 		var ce = this.getCellEntity(mapPos.x,mapPos.y);
 		if(ce != null) {
-			return ce;
+			var _g2 = 0;
+			while(_g2 < ce.length) {
+				var e1 = ce[_g2];
+				++_g2;
+				res.push(e1);
+			}
 		}
-		return null;
+		if(res.length < 1) {
+			return null;
+		} else {
+			return res;
+		}
 	}
 	,removeEntity: function(entity) {
 		if(js_Boot.__instanceof(entity,ent_StaticEntity)) {
@@ -54734,9 +54837,9 @@ map_Level.prototype = {
 				b.isCollide = true;
 				continue;
 			}
-			var ent = this.isEntityCollide(b.entity1,b.bounds,b.side,b.exceptEntity);
-			if(ent != null) {
-				b.entity2 = ent;
+			var entArr = this.isEntityCollide(b.parentEntity,b.bounds,b.side,b.exceptEntity);
+			if(entArr != null && entArr.length > 0) {
+				b.entities = entArr;
 				b.isCollide = true;
 			}
 		}
@@ -55054,15 +55157,12 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",value);
 	}
 	,onWallDesctroyed: function(x,y) {
-		var _gthis = this;
 		var _g = this.ctx.settings.player;
 		var value = _g._score + 1;
 		_g._score = value;
 		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",value);
-		this.ctx.waitEvent.wait(2,function() {
-			var poverUp = _gthis.level.recyclePowerUp();
-			_gthis.level.placeEntity(x,y,poverUp);
-		});
+		var poverUp = this.level.recyclePowerUp();
+		this.level.placeEntity(x,y,poverUp);
 	}
 	,onPlayerDied: function() {
 		this.gameOverDialog.show();

@@ -57,8 +57,14 @@ class Mob extends MovingEntity {
         if (cols.length > 0) {            
             var play : Entity = null;
             for (c in cols) {
-                if (Std.is(c.entity1, Player)) play = c.entity1;
-                if (Std.is(c.entity2, Player)) play = c.entity2;
+                if (c.entities != null) {
+                    for (ent in c.entities) {
+                        if (Std.is(ent, Player)) {
+                            play = ent;
+                            break;
+                        }
+                    }
+                }
             }
             if (play != null) {
                 play.onHit ();

@@ -11,12 +11,12 @@ typedef CollisionInfo = {
     /**
      *  Parent entity
      */
-    var entity1 : Entity;
+    var parentEntity : Entity;
 
     /**
-     *  Entity with wich collides
+     *  Entities with collide
      */
-    @:optional var entity2 : Entity;
+    @:optional var entities : Array<Entity>;
 
     /**
      *  Entity which not need to check

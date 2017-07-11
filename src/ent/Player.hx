@@ -72,9 +72,15 @@ class Player extends MovingEntity {
      *  Filter collision
      */
     function onFilterCollision (c : CollisionInfo) : Bool {
-        if ((placedBomb != null) && (c.entity2 == placedBomb)) {
-            wasBombCollide = true;
-            return true;
+        if (placedBomb != null) {
+            if (c.entities != null) {                
+                for (e in c.entities) {                    
+                    if (e == placedBomb) {
+                        wasBombCollide = true;
+                        return true;
+                    }
+                }
+            }
         }
 
         return false;
@@ -95,13 +101,14 @@ class Player extends MovingEntity {
         if (hxd.Key.isDown (hxd.Key.A)) dx = -speed * dt;
         if (hxd.Key.isDown (hxd.Key.D)) dx = speed * dt;
 
-        wasBombCollide = false;
-        move (dx, dy);
-        if (!wasBombCollide) placedBomb = null;
-
         if (hxd.Key.isPressed (hxd.Key.SPACE)) {
             placeBomb ();
         }
+
+        if ((dx < 0.001 && dx > -0.001) && (dy < 0.001 && dy > -0.001)) return;
+        wasBombCollide = false;        
+        move (dx, dy);
+        if (!wasBombCollide) placedBomb = null;
     }
 
     /**
@@ -110,9 +117,13 @@ class Player extends MovingEntity {
      */
     function onCollision (cols : Array<CollisionInfo>) : Void {
         for (c in cols) {
-            if (c.entity2 != null && Std.is (c.entity2, PowerUp)) {
-                c.entity2.onHit ();
-                gameScreen.onPowerUp (cast c.entity2);
+            if (c.entities != null) {
+                for (ent in c.entities) {
+                    if (Std.is (ent, PowerUp)) {
+                        ent.onHit ();
+                        gameScreen.onPowerUp (cast ent);
+                    }
+                }
             }
         }
     }

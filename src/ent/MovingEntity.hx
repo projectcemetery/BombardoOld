@@ -24,7 +24,7 @@ class MovingEntity extends LevelEntity {
             var b = bounds.clone ();
             b.xMax += dx;
             cols.push ({
-                entity1 : this,
+                parentEntity : this,
                 side : Side.Right,
                 bounds : b                
             });
@@ -34,7 +34,7 @@ class MovingEntity extends LevelEntity {
             var b = bounds.clone ();
             b.xMin += dx;
             cols.push ({
-                entity1 : this,
+                parentEntity : this,
                 side : Side.Left,
                 bounds : b
             });
@@ -45,7 +45,7 @@ class MovingEntity extends LevelEntity {
             var b = bounds.clone ();
             b.yMax += dy;
             cols.push ({
-                entity1 : this,
+                parentEntity : this,
                 side : Side.Bottom,
                 bounds : b                
             });          
@@ -56,28 +56,35 @@ class MovingEntity extends LevelEntity {
             b.yMin += dy;
             
             cols.push ({
-                entity1 : this,
+                parentEntity : this,
                 side : Side.Top,
                 bounds : b,
             });
         }
 
         cols = level.isCollide (cols);
-
         var cdx = 0.0;
         var cdy = 0.0;
 
         var colCompl = new Array<CollisionInfo>();
         for (c in cols) {
             // If true then collision not need check
-            if (onFilterCollisionInternal != null) {
+            if (onFilterCollisionInternal != null) {                
                 if (onFilterCollisionInternal (c)) c.isCollide = false;
             }
 
-            if (c.entity2 != null && c.entity2.onCollisionInternal != null) c.entity2.onCollisionInternal ([c]);
+            var isObstacle = true;
+            if (c.entities != null) {
+                var isOb = false;
+                for (ent in c.entities) {
+                    if (ent.onCollisionInternal != null) ent.onCollisionInternal ([c]);
+                    if (!isOb && ent.isObstacle) isOb = true;
+                }
+                isObstacle = isOb;
+            }
 
-            // If no collision or entity is not obstacle
-            if (!c.isCollide || (c.entity2 != null && !c.entity2.isObstacle)) {
+            // If no collision or entity is not obstacle            
+            if (!c.isCollide || !isObstacle) {
                 switch (c.side) {
                     case Side.Top: 
                         model.y += dy;
