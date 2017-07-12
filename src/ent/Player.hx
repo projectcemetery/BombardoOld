@@ -2,6 +2,7 @@ package ent;
 
 import col.CollisionInfo;
 import ent.Bomb;
+import h3d.anim.Animation;
 
 /**
  *  Player
@@ -29,27 +30,53 @@ class Player extends MovingEntity {
     var wasBombCollide = false;
 
     /**
+     *  Run animation
+     */
+    var runAnimation : Animation;
+
+    /**
+     *  Idle animation
+     */
+    var idleAnimation : Animation;
+
+    /**
+     *  Current animation
+     */
+    var currentAnimation : Animation;
+
+    /**
+     *  Is player moving
+     */
+    var isRunning : Bool;
+
+    /**
      *  Move
      *  @param x - 
      */
     function onMoveComplete (dx : Float, dy : Float) : Void {
-        ctx.scene3d.camera.move (dx, dy);
+        ctx.scene3d.camera.move (dx, dy);                
 
         if (dx > 0) {
-            model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
+            model.setRotateAxis (0,0, 1, 180 * 3.14 / 180);            
+            isRunning = true;
         }
 
         if (dx < 0) {
-            model.setRotateAxis (0,0, 1, -90 * 3.14 / 180);
+            model.setRotateAxis (0,0, 1, 0);
+            isRunning = true;
         }
 
         if (dy < 0) {
-            model.setRotateAxis (0,0, 1, 0);
+            model.setRotateAxis (0,0, 1, 90 * 3.14 / 180);
+            isRunning = true;
         }
 
         if (dy > 0) {
-            model.setRotateAxis (0,0, 1, 180 * 3.14 / 180);
+            model.setRotateAxis (0,0, 1, -90 * 3.14 / 180);
+            isRunning = true;
         }
+
+        playAnimation ();
     }
 
     /**
@@ -93,6 +120,7 @@ class Player extends MovingEntity {
     function onUpdate (dt : Float) : Void {
         if (isDisposed) return;
         
+        isRunning = false;
         var dx = 0.0;
         var dy = 0.0;
 
@@ -105,7 +133,11 @@ class Player extends MovingEntity {
             placeBomb ();
         }
 
-        if ((dx < 0.001 && dx > -0.001) && (dy < 0.001 && dy > -0.001)) return;
+        if ((dx < 0.001 && dx > -0.001) && (dy < 0.001 && dy > -0.001)) {
+            playAnimation ();
+            return;            
+        }
+
         wasBombCollide = false;        
         move (dx, dy);
         if (!wasBombCollide) placedBomb = null;
@@ -129,13 +161,29 @@ class Player extends MovingEntity {
     }
 
     /**
+     *  Playe animation
+     */
+    function playAnimation () : Void {
+        if (isRunning && currentAnimation != runAnimation) {
+            model.playAnimation (runAnimation);
+            currentAnimation = runAnimation;
+        } else if (!isRunning && currentAnimation != idleAnimation) {
+            model.playAnimation (idleAnimation);
+            currentAnimation = idleAnimation;
+        }
+    }
+
+    /**
      *  Constructor
      */
     public function new  () {
         super ();
 
-        model = ctx.modelCache.loadModel(hxd.Res.testchar);
-        model.scale (0.0015);
+        runAnimation = ctx.modelCache.loadAnimation(hxd.Res.run_forward_inPlace);
+        idleAnimation = ctx.modelCache.loadAnimation(hxd.Res.happy_idle);
+
+        model = ctx.modelCache.loadModel(hxd.Res.charWork);        
+        model.scale (0.05);                
         reset ();
     }
 
@@ -143,6 +191,7 @@ class Player extends MovingEntity {
      *  Reset player data
      */
     override public function reset () : Void {
+        isRunning = false;
         placedCount = 0;
         placedBomb = null;
         wasBombCollide = false;
