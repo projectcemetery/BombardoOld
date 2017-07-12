@@ -40,6 +40,14 @@ class PlayerSettings extends ChangeNotifier {
     public var powerUpChance = 10; 
 
     /**
+     *  Reset settings
+     */
+    public function reset () {
+        maxBombCount = 1;
+        score = 0;
+    }
+
+    /**
      *  Constructor
      */
     public function new () {}

@@ -123,12 +123,7 @@ class Hud extends Gui {
      */
     public function new () {
         super ();
-    }
 
-    /**
-     *  On post create
-     */
-    public function init () {
         ctx = GameContext.get ();
 
         var font = hxd.Res.trueTypeFont.build(24);
@@ -176,5 +171,5 @@ class Hud extends Gui {
         });
 
         ctx.waitEvent.waitUntil (onUpdate);
-    }    
+    }
 }

@@ -40,6 +40,7 @@ class GameScreen extends Screen {
      *  Restart game
      */
     function restart () : Void {
+        ctx.settings.player.reset ();
         level.restart ();
         player = new Player ();
         level.placePlayer (player);
@@ -50,7 +51,6 @@ class GameScreen extends Screen {
      */
     function placePowerup (x : Int, y : Int) {
         var chance = Math.random () * 100;
-        trace (chance);
         if (ctx.settings.player.powerUpChance > 100 - chance) {
             var poverUp = level.recyclePowerUp ();
             level.placeEntity (x, y, poverUp);
@@ -63,7 +63,6 @@ class GameScreen extends Screen {
     override public function onEnter () : Void {
         level = new Level ();
         hud = new Hud ();
-        hud.init ();
         gameOverDialog = new GameOverDialog ();
         gameOverDialog.onRestart = function () {
             gameOverDialog.hide ();

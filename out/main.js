@@ -6005,7 +6005,64 @@ gui_Gui.prototype = $extend(h2d_Sprite.prototype,{
 var gui_Hud = function() {
 	this.isDebug = false;
 	this.spacing = 10;
+	var _gthis = this;
 	gui_Gui.call(this);
+	this.ctx = app_GameContext.get();
+	var font = hxd_Res.get_loader().loadFont("trueTypeFont.ttf").build(24);
+	var bombTile = hxd_Res.get_loader().loadImage("hbomb.png").toTile();
+	this.bombImage = new h2d_Bitmap(bombTile,this);
+	this.bombCounttxt = new h2d_Text(font,this.bombImage);
+	this.bombCounttxt.set_textColor(0);
+	var _this = this.bombCounttxt;
+	var v = this.bombImage.getSize().xMax - 24;
+	_this.posChanged = true;
+	_this.x = v;
+	var _this1 = this.bombCounttxt;
+	_this1.posChanged = true;
+	_this1.y = 5;
+	this.bombCounttxt.set_text(Std.string(this.ctx.settings.player._maxBombCount));
+	var explosionTile = hxd_Res.get_loader().loadImage("hexplosion.png").toTile();
+	this.explosionImage = new h2d_Bitmap(explosionTile,this);
+	var _this2 = this.explosionImage;
+	var v1 = this.bombImage.getBounds().xMax + this.spacing;
+	_this2.posChanged = true;
+	_this2.x = v1;
+	var etxt = new h2d_Text(font,this.explosionImage);
+	etxt.set_textColor(0);
+	var v2 = this.explosionImage.getSize().xMax - 24;
+	etxt.posChanged = true;
+	etxt.x = v2;
+	etxt.posChanged = true;
+	etxt.y = 5;
+	etxt.set_text("2");
+	var scoreTile = hxd_Res.get_loader().loadImage("hscores.png").toTile();
+	this.scoreImage = new h2d_Bitmap(scoreTile,this);
+	var _this3 = this.scoreImage;
+	var v3 = this.explosionImage.getBounds().xMax + this.spacing;
+	_this3.posChanged = true;
+	_this3.x = v3;
+	this.scoreTxt = new h2d_Text(font,this.scoreImage);
+	this.scoreTxt.set_textColor(0);
+	var _this4 = this.scoreTxt;
+	var v4 = this.scoreImage.getSize().xMax - 68;
+	_this4.posChanged = true;
+	_this4.x = v4;
+	var _this5 = this.scoreTxt;
+	_this5.posChanged = true;
+	_this5.y = 5;
+	this.setScore(this.ctx.settings.player._score);
+	this.posChanged = true;
+	this.x = 10;
+	this.posChanged = true;
+	this.y = 10;
+	this.ctx.scene2d.addChild(this);
+	this.ctx.dispatcher.addHandler("settings.PlayerSettings.score",function(e) {
+		_gthis.setScore(e);
+	});
+	this.ctx.dispatcher.addHandler("settings.PlayerSettings.maxBombCount",function(e1) {
+		_gthis.setBombCount(e1);
+	});
+	this.ctx.waitEvent.waitUntil($bind(this,this.onUpdate));
 };
 $hxClasses["gui.Hud"] = gui_Hud;
 gui_Hud.__name__ = ["gui","Hud"];
@@ -6069,65 +6126,6 @@ gui_Hud.prototype = $extend(gui_Gui.prototype,{
 			this.fpsTxt.set_text("FPS: " + this.ctx.engine.get_fps());
 		}
 		return false;
-	}
-	,init: function() {
-		var _gthis = this;
-		this.ctx = app_GameContext.get();
-		var font = hxd_Res.get_loader().loadFont("trueTypeFont.ttf").build(24);
-		var bombTile = hxd_Res.get_loader().loadImage("hbomb.png").toTile();
-		this.bombImage = new h2d_Bitmap(bombTile,this);
-		this.bombCounttxt = new h2d_Text(font,this.bombImage);
-		this.bombCounttxt.set_textColor(0);
-		var _this = this.bombCounttxt;
-		var v = this.bombImage.getSize().xMax - 24;
-		_this.posChanged = true;
-		_this.x = v;
-		var _this1 = this.bombCounttxt;
-		_this1.posChanged = true;
-		_this1.y = 5;
-		this.bombCounttxt.set_text(Std.string(this.ctx.settings.player._maxBombCount));
-		var explosionTile = hxd_Res.get_loader().loadImage("hexplosion.png").toTile();
-		this.explosionImage = new h2d_Bitmap(explosionTile,this);
-		var _this2 = this.explosionImage;
-		var v1 = this.bombImage.getBounds().xMax + this.spacing;
-		_this2.posChanged = true;
-		_this2.x = v1;
-		var etxt = new h2d_Text(font,this.explosionImage);
-		etxt.set_textColor(0);
-		var v2 = this.explosionImage.getSize().xMax - 24;
-		etxt.posChanged = true;
-		etxt.x = v2;
-		etxt.posChanged = true;
-		etxt.y = 5;
-		etxt.set_text("2");
-		var scoreTile = hxd_Res.get_loader().loadImage("hscores.png").toTile();
-		this.scoreImage = new h2d_Bitmap(scoreTile,this);
-		var _this3 = this.scoreImage;
-		var v3 = this.explosionImage.getBounds().xMax + this.spacing;
-		_this3.posChanged = true;
-		_this3.x = v3;
-		this.scoreTxt = new h2d_Text(font,this.scoreImage);
-		this.scoreTxt.set_textColor(0);
-		var _this4 = this.scoreTxt;
-		var v4 = this.scoreImage.getSize().xMax - 68;
-		_this4.posChanged = true;
-		_this4.x = v4;
-		var _this5 = this.scoreTxt;
-		_this5.posChanged = true;
-		_this5.y = 5;
-		this.setScore(this.ctx.settings.player._score);
-		this.posChanged = true;
-		this.x = 10;
-		this.posChanged = true;
-		this.y = 10;
-		this.ctx.scene2d.addChild(this);
-		this.ctx.dispatcher.addHandler("settings.PlayerSettings.score",function(e) {
-			_gthis.setScore(e);
-		});
-		this.ctx.dispatcher.addHandler("settings.PlayerSettings.maxBombCount",function(e1) {
-			_gthis.setBombCount(e1);
-		});
-		this.ctx.waitEvent.waitUntil($bind(this,this.onUpdate));
 	}
 	,__class__: gui_Hud
 });
@@ -55165,13 +55163,13 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 	,gameOverDialog: null
 	,level: null
 	,restart: function() {
+		this.ctx.settings.player.reset();
 		this.level.restart();
 		this.player = new ent_Player();
 		this.level.placePlayer(this.player);
 	}
 	,placePowerup: function(x,y) {
 		var chance = Math.random() * 100;
-		haxe_Log.trace(chance,{ fileName : "GameScreen.hx", lineNumber : 53, className : "screen.GameScreen", methodName : "placePowerup"});
 		if(this.ctx.settings.player.powerUpChance > 100 - chance) {
 			var poverUp = this.level.recyclePowerUp();
 			this.level.placeEntity(x,y,poverUp);
@@ -55181,7 +55179,6 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 		var _gthis = this;
 		this.level = new map_Level();
 		this.hud = new gui_Hud();
-		this.hud.init();
 		this.gameOverDialog = new gui_GameOverDialog();
 		this.gameOverDialog.onRestart = function() {
 			_gthis.gameOverDialog.hide();
@@ -55247,6 +55244,12 @@ settings_PlayerSettings.prototype = $extend(dispatch_ChangeNotifier.prototype,{
 	,bombBoomLength: null
 	,boomTime: null
 	,powerUpChance: null
+	,reset: function() {
+		this._maxBombCount = 1;
+		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.maxBombCount",1);
+		this._score = 0;
+		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",0);
+	}
 	,__class__: settings_PlayerSettings
 });
 var settings_Settings = function() {
