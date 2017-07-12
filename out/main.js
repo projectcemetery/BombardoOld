@@ -1326,6 +1326,9 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 		}
 		var lifetime = this.ctx.settings.player.beforeBoom;
 		this.ctx.waitEvent.wait(lifetime,function() {
+			if(_gthis.isDisposed) {
+				return;
+			}
 			_gthis.boom();
 		});
 	}
@@ -1839,6 +1842,17 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		var _gthis = this;
 		if(this.placedCount >= this.ctx.settings.player._maxBombCount) {
 			return;
+		}
+		var entArr = this.level.getEntity(this.model.x,this.model.y);
+		if(entArr != null) {
+			var _g = 0;
+			while(_g < entArr.length) {
+				var e = entArr[_g];
+				++_g;
+				if(js_Boot.__instanceof(e,ent_Bomb)) {
+					return;
+				}
+			}
 		}
 		this.placedCount += 1;
 		this.placedBomb = this.level.recycleBomb();
@@ -55155,6 +55169,14 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 		this.player = new ent_Player();
 		this.level.placePlayer(this.player);
 	}
+	,placePowerup: function(x,y) {
+		var chance = Math.random() * 100;
+		haxe_Log.trace(chance,{ fileName : "GameScreen.hx", lineNumber : 53, className : "screen.GameScreen", methodName : "placePowerup"});
+		if(this.ctx.settings.player.powerUpChance > 100 - chance) {
+			var poverUp = this.level.recyclePowerUp();
+			this.level.placeEntity(x,y,poverUp);
+		}
+	}
 	,onEnter: function() {
 		var _gthis = this;
 		this.level = new map_Level();
@@ -55184,8 +55206,7 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 		var value = _g._score + 1;
 		_g._score = value;
 		app_GameContext.get().dispatcher.notify("settings.PlayerSettings.score",value);
-		var poverUp = this.level.recyclePowerUp();
-		this.level.placeEntity(x,y,poverUp);
+		this.placePowerup(x,y);
 	}
 	,onPlayerDied: function() {
 		this.gameOverDialog.show();
@@ -55193,6 +55214,7 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 	,__class__: screen_GameScreen
 });
 var settings_PlayerSettings = function() {
+	this.powerUpChance = 10;
 	this.boomTime = 1;
 	this.bombBoomLength = 2;
 	this.beforeBoom = 3;
@@ -55224,6 +55246,7 @@ settings_PlayerSettings.prototype = $extend(dispatch_ChangeNotifier.prototype,{
 	,beforeBoom: null
 	,bombBoomLength: null
 	,boomTime: null
+	,powerUpChance: null
 	,__class__: settings_PlayerSettings
 });
 var settings_Settings = function() {

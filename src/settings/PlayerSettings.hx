@@ -35,6 +35,11 @@ class PlayerSettings extends ChangeNotifier {
     public var boomTime : Int = 1;
 
     /**
+     *  Chance of powerup in percent
+     */
+    public var powerUpChance = 10; 
+
+    /**
      *  Constructor
      */
     public function new () {}

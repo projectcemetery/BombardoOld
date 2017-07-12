@@ -85,6 +85,14 @@ class Player extends MovingEntity {
     function placeBomb () : Void {
         if (placedCount >= ctx.settings.player.maxBombCount) return;
 
+        // Check bomb exists
+        var entArr = level.getEntity (model.x, model.y);
+        if (entArr != null) {
+            for (e in entArr) {
+                if (Std.is (e, Bomb)) return;
+            }
+        }
+
         placedCount += 1;
         // Place bomb
         placedBomb = level.recycleBomb ();

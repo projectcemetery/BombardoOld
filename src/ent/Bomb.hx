@@ -152,6 +152,7 @@ class Bomb extends StaticEntity {
         var lifetime = ctx.settings.player.beforeBoom;        
 
         ctx.waitEvent.wait (lifetime, function () {
+            if (isDisposed) return;
             boom ();
         });
     }
