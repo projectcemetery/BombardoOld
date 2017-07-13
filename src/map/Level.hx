@@ -53,36 +53,6 @@ class Level {
     var ctx : GameContext;
 
     /**
-     *  Box for walls and floor
-     */
-    var box : h3d.prim.Cube;
-
-    /**
-     *  Cube for indestructable wall
-     */
-    var wallCube : prim.PartialCube;
-
-    /**
-     *  Cube for floor
-     */
-    var floorCube : prim.PartialCube;
-
-    /**
-     *  Material for level
-     */
-    var levelMat : h3d.mat.MeshMaterial;
-
-    /**
-     *  Big primitive for level
-     */
-    var levelPrim : h3d.prim.BigPrimitive;
-
-    /**
-     *  Big mesh for level
-     */
-    var levelMesh : h3d.scene.Mesh;  
-
-    /**
      *  Map width
      */
     var mapWidth : Int;
@@ -115,7 +85,22 @@ class Level {
     /**
      *  Moving entities
      */
-    var moveEntities : Array<Entity> = new Array<Entity> ();    
+    var moveEntities : Array<Entity> = new Array<Entity> ();
+
+    /**
+     *  Level world
+     */
+    var world : h3d.scene.World;
+
+    /**
+     *  Wall model
+     */
+    var wallModel : h3d.scene.World.WorldModel;
+
+    /**
+     *  Floor model
+     */
+    var floorModel : h3d.scene.World.WorldModel;
 
     /**
      *  Get linear cell position
@@ -142,7 +127,7 @@ class Level {
      *  @param y - 
      */
     function addWall (x : Int, y : Int) : Void {
-        levelPrim.add (wallCube.buffer, wallCube.idx, x, y);
+        world.add (wallModel, x + 0.5, y + 0.5, 0.0, 0.025, 0);
         var pos = getPos (x, y);        
         wallMap[pos] = Bounds.fromValues (x, y, 0, 1, 1, 1);
     }
@@ -164,14 +149,14 @@ class Level {
      */
 
     function addFloor (x : Int, y : Int) {
-        levelPrim.add (floorCube.buffer, floorCube.idx, x, y, -1);
+        world.add (floorModel, x + 0.5, y + 0.5, -0.4, 0.025, 0);
     }
 
     /**
      *  Create level
      */
     function createLevel () {
-        var tiled = hxd.Res.map1.toMap ();        
+        var tiled = hxd.Res.map2.toMap ();        
         mapWidth = tiled.width;        
         mapHeight = tiled.height;
 
@@ -407,19 +392,6 @@ class Level {
      */
     public function new () {
         ctx = GameContext.get ();
-
-        wallCube = new prim.PartialCube (1, 2);
-        wallCube.full ();
-        wallCube.prepare ();
-
-        floorCube = new prim.PartialCube (1, 2);
-        floorCube.setSideInfo (CubeSide.SBottom, 1);
-        floorCube.prepare ();
-
-        var levelTex = hxd.Res.level.toTexture ();
-        levelMat = new h3d.mat.MeshMaterial (levelTex);
-        levelMat.mainPass.enableLights = true;
-        levelMat.shadows = true;
     }
 
     /**
@@ -486,15 +458,20 @@ class Level {
                 
         for (e in moveEntities) entities.push (e);
         for (e in entities) removeEntity (e);
-        moveEntities = new Array<Entity> ();   
+        moveEntities = new Array<Entity> ();
 
-        ctx.scene3d.removeChild (levelMesh);
+        ctx.scene3d.removeChild (world);
 
-        levelPrim = new h3d.prim.BigPrimitive (8);
-        levelMesh = new h3d.scene.Mesh (levelPrim, levelMat);
+        world = new h3d.scene.World(64, 128);
+        wallModel = world.loadModel(hxd.Res.wall1);
+        floorModel = world.loadModel(hxd.Res.floor1);
 
         createLevel ();
-        ctx.scene3d.addChild (levelMesh);
+        //ctx.scene3d.addChild (levelMesh);
+
+        world.done ();
+        //world.setPos (-10, -10, -0.01);
+        ctx.scene3d.addChild (world);
         
         // TODO settings about mobs in player settings
         placeMobs ();

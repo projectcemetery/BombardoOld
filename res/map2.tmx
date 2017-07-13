@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.1" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="32" tileheight="32" nextobjectid="4">
+ <tileset firstgid="1" source="../art/Terrain.tsx"/>
+ <layer name="Floor" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAM6DHixrjkkfUi08jq0e3ApQ6fXehi6Obhk0c3g1p6KXUzNcKKlDgiFwAACfINlw==
+  </data>
+ </layer>
+ <layer name="DestructableWalls" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOyMOCcanBJk5IDbo6QubhMoNYgGwGqWbh00upm8kNK2T15MQRqQAAJAYPeQ==
+  </data>
+ </layer>
+ <layer name="Walls" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJwzZGRgMKQA4wO45JH1ItPI6tHtwKUOn13oYujm4ZNHN4Naeil1MzbzSA0rQm5AN5McDACF2w7Z
+  </data>
+ </layer>
+ <layer name="PlayerSpawn" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMuDBRaMAooDkYiDgCALScAI0=
+  </data>
+ </layer>
+ <layer name="MobSpawn" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYBj8II9peNhBDzBY/AEAj6EBUQ==
+  </data>
+ </layer>
+</map>
