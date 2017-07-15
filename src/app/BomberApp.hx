@@ -28,14 +28,10 @@ class BomberApp extends hxd.App {
         ctx.startScreen (GameScreen.NAME);
 
         var dir = new h3d.scene.DirLight(new h3d.Vector(0.2, 0.3, -1), s3d);        
-        dir.color.set(0.15, 0.15, 0.15);
+        dir.color.set(0.35, 0.35, 0.35);
         
         s3d.camera.zNear = 1;
         s3d.camera.zFar = 30;
-
-        /*var gameover = new gui.GameOverDialog ();
-        gameover.init ();
-        gameover.show ();*/
 
         /*var model = modelCache.loadModel(hxd.Res.bombpowerup);    
         model.scale (0.006);

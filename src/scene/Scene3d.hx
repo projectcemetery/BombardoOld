@@ -36,6 +36,7 @@ class Scene3d {
         objects = new Array<Object> ();
         calcTime = 0;
         s3d = scene;
+        s3d.lightSystem.ambientLight.set(0.4, 0.4, 0.4);
         camera = new Camera (s3d);
         wait.waitUntil (onUpdate);
     }

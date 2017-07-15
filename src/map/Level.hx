@@ -23,6 +23,16 @@ import ent.PowerUp;
 class Level {
     
     /**
+     *  Id of tower
+     */
+    static inline var TOWER_MAP_ID = 113;
+
+    /**
+     *  Id of wall
+     */
+    static inline var WALL_MAP_ID = 305;
+
+    /**
      *  Wall layer name
      */
     static inline var WALLS_LAYER = "Walls";
@@ -98,9 +108,24 @@ class Level {
     var wallModel : h3d.scene.World.WorldModel;
 
     /**
+     *  Tower model
+     */
+    var towerModel : h3d.scene.World.WorldModel;
+
+    /**
      *  Floor model
      */
     var floorModel : h3d.scene.World.WorldModel;
+
+    /**
+     *  Background model
+     */
+    var backModel : h3d.scene.World.WorldModel;
+
+    /**
+     *  Tree model
+     */
+    var treeModel : h3d.scene.World.WorldModel;
 
     /**
      *  Get linear cell position
@@ -126,8 +151,14 @@ class Level {
      *  @param x - 
      *  @param y - 
      */
-    function addWall (x : Int, y : Int) : Void {
-        world.add (wallModel, x + 0.5, y + 0.5, 0.0, 0.025, 0);
+    function addWall (id : Int, x : Int, y : Int) : Void {        
+        switch (id) {
+            case TOWER_MAP_ID: 
+                world.add (towerModel, x + 0.5, y + 0.5, 0.0, 0.009, 0);
+            case WALL_MAP_ID: 
+                world.add (wallModel, x + 0.5, y + 0.5, 0.0, 0.009, 0);
+            default: 
+        }
         var pos = getPos (x, y);        
         wallMap[pos] = Bounds.fromValues (x, y, 0, 1, 1, 1);
     }
@@ -149,7 +180,46 @@ class Level {
      */
 
     function addFloor (x : Int, y : Int) {
-        world.add (floorModel, x + 0.5, y + 0.5, -0.4, 0.025, 0);
+        world.add (floorModel, x + 0.5, y + 0.5, 0.01, 0.005, 0);
+    }
+
+    /**
+     *  Fill level background
+     */
+    function fillBackground () {
+        var xlen = 20 + mapWidth;
+        var ylen = 20 + mapHeight;
+
+        trace (xlen, ylen);
+        for (x in 0...xlen) {
+            for (y in 0...ylen) {
+                var mx = -10 + x;
+                var my = -10 + y;
+                if ((mx < 1 || mx > mapWidth) || (my < 1 || my > mapHeight)) {
+                    world.add (backModel, mx - 0.5 , my - 0.5, 0.01, 0.005, 0);
+                }                
+            }
+        }
+
+        world.add (treeModel, -3, -3, 0.0, 0.025, 0);
+        world.add (treeModel, -2, 0, 0.0, 0.025, 0);
+        world.add (treeModel, -3.5, 4, 0.0, 0.025, 0);
+        world.add (treeModel, -1.5, 8, 0.0, 0.025, 0);
+
+        world.add (treeModel, 17, -3, 0.0, 0.025, 0);
+        world.add (treeModel, 19, 0, 0.0, 0.025, 0);
+        world.add (treeModel, 17, 4, 0.0, 0.025, 0);
+        world.add (treeModel, 18, 8, 0.0, 0.025, 0);
+
+        world.add (treeModel, 2, -3, 0.0, 0.025, 0);
+        world.add (treeModel, 6, -2, 0.0, 0.025, 0);
+        world.add (treeModel, 9, -4, 0.0, 0.025, 0);
+        world.add (treeModel, 14, -3, 0.0, 0.025, 0);
+
+        world.add (treeModel, 2, 12, 0.0, 0.025, 0);
+        world.add (treeModel, 6, 13, 0.0, 0.025, 0);
+        world.add (treeModel, 9, 12, 0.0, 0.025, 0);
+        world.add (treeModel, 14, 11, 0.0, 0.025, 0);
     }
 
     /**
@@ -168,11 +238,11 @@ class Level {
                 if (x >= mapWidth) {
                     x = 0;
                     y += 1;
-                }
+                }                
                 
                 if (dat > 0) {
                     switch (layer.name) {
-                        case WALLS_LAYER : addWall (x, y);
+                        case WALLS_LAYER : addWall (dat, x, y);
                         case DESTRUCTABLE_WALLS_LAYER: addDestructableWall (x, y);
                         case FLOOR_LAYER : addFloor (x, y);
                         case PLAYER_SPAWN_LAYER: 
@@ -186,6 +256,8 @@ class Level {
                 x += 1;
             }
         }
+
+        fillBackground ();
     }
 
     /**
@@ -463,11 +535,13 @@ class Level {
         ctx.scene3d.removeChild (world);
 
         world = new h3d.scene.World(64, 128);
-        wallModel = world.loadModel(hxd.Res.wall1);
-        floorModel = world.loadModel(hxd.Res.floor1);
+        wallModel = world.loadModel(hxd.Res.wall2);
+        towerModel = world.loadModel(hxd.Res.tower1);
+        floorModel = world.loadModel(hxd.Res.back1);
+        backModel = world.loadModel(hxd.Res.back1);
+        treeModel = world.loadModel(hxd.Res.tree1);
 
         createLevel ();
-        //ctx.scene3d.addChild (levelMesh);
 
         world.done ();
         //world.setPos (-10, -10, -0.01);

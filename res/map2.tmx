@@ -13,7 +13,7 @@
  </layer>
  <layer name="Walls" width="15" height="10">
   <data encoding="base64" compression="zlib">
-   eJwzZGRgMKQA4wO45JH1ItPI6tHtwKUOn13oYujm4ZNHN4Naeil1MzbzSA0rQm5AN5McDACF2w7Z
+   eJwrZGBgMGQkHRdC9eEDuORhZiCrgZmJrgYmX4hFLyG70MXQ7cUnj24GtfRS6mYYTUlYEXIDsh3kpg0A0qkQ0Q==
   </data>
  </layer>
  <layer name="PlayerSpawn" width="15" height="10">
