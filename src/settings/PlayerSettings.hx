@@ -17,8 +17,8 @@ class PlayerSettings extends ChangeNotifier {
      *  Player score
      */
     @:notify
-    var score : Int = 0;
-    
+    var score : Int = 0;        
+
     /**
      *  Time before boom
      */

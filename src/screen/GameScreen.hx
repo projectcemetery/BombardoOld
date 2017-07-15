@@ -40,6 +40,7 @@ class GameScreen extends Screen {
      *  Restart game
      */
     function restart () : Void {
+        ctx.settings.mobCount = 0;
         ctx.settings.player.reset ();
         level.restart ();
         player = new Player ();
@@ -84,6 +85,13 @@ class GameScreen extends Screen {
      */
     public function onMobKilled () : Void {
         ctx.settings.player.score += 5;
+        ctx.settings.mobCount -= 1;
+
+        if (ctx.settings.mobCount < 1) {
+            gameOverDialog.setTitle ("You Win");
+            level.removeEntity (player);
+            gameOverDialog.show ();
+        }
     }
 
     /**
@@ -99,6 +107,7 @@ class GameScreen extends Screen {
      *  Notify that player died
      */
     public function onPlayerDied () : Void {
+        gameOverDialog.setTitle ("Game Over");
         gameOverDialog.show ();
     }
 }

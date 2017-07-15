@@ -11,6 +11,11 @@ class Settings {
     public var player : PlayerSettings;
 
     /**
+     *  Mob count
+     */
+    public var mobCount : Int = 0;
+
+    /**
      *  Constructor
      */
     public function new () {

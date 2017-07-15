@@ -33,6 +33,11 @@ class GameOverDialog extends Sprite {
     var cursorPoint : Point;
 
     /**
+     *  Title text
+     */
+    var titleTxt : h2d.Text;
+
+    /**
      *  Text for player score
      */
     var scoreTxt : h2d.Text;
@@ -73,6 +78,18 @@ class GameOverDialog extends Sprite {
         var tile = hxd.Res.gameover.toTile ();
         dialogImage = new Bitmap (tile, this);    
 
+        titleTxt = new h2d.Text(font, dialogImage);
+        titleTxt.textColor = 0xFFFFFF;
+        titleTxt.text = "Game Over";
+        titleTxt.x = dialogImage.getSize().width / 2 - titleTxt.textWidth / 2;
+        titleTxt.y = 245;
+
+        var yourScoreTxt = new h2d.Text(font, dialogImage);
+        yourScoreTxt.textColor = 0xFFFFFF;
+        yourScoreTxt.text = "Your score";
+        yourScoreTxt.x = dialogImage.getSize().width / 2 - yourScoreTxt.textWidth / 2;
+        yourScoreTxt.y = 325;        
+
         scoreTxt = new h2d.Text(font, dialogImage);
 		scoreTxt.textColor = 0xFFFFFF;
         scoreTxt.x = 200;
@@ -82,6 +99,12 @@ class GameOverDialog extends Sprite {
         retryButton = new Bitmap (buttonTile, dialogImage);
         retryButton.x = (tile.width / 2) - buttonTile.width / 2;
         retryButton.y = tile.height - buttonTile.height + 10;
+
+        var buttonTxt = new h2d.Text(font, retryButton);
+        buttonTxt.textColor = 0xFFFFFF;
+        buttonTxt.x = 65;
+        buttonTxt.y = 13;
+        buttonTxt.text = "Retry";
 
         ctx.scene2d.addChild (this);
         this.visible = false;
@@ -107,5 +130,14 @@ class GameOverDialog extends Sprite {
      */
     public function hide () : Void {
         visible = false;
+    }
+
+    /**
+     *  Set dialog title
+     *  @param title - 
+     */
+    public function setTitle (title : String) : Void {
+        titleTxt.text = title;
+        titleTxt.x = dialogImage.getSize().width / 2 - titleTxt.textWidth / 2;
     }
 }

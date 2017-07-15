@@ -267,6 +267,7 @@ class Level {
         for (p in mobSpawnPoints) {
             var mob = recicleMob ();
             placeEntity (p.x, p.y, mob);
+            ctx.settings.mobCount += 1;
         }
     }
 
@@ -513,7 +514,7 @@ class Level {
      *  Init after create
      */
     public function restart () {
-        // Preload
+        // Preload        
         var bomb = recycleBomb ();        
         bomb.onDispose ();
 
