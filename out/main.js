@@ -1190,7 +1190,11 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 				while(_g < entArr.length) {
 					var entity = entArr[_g];
 					++_g;
-					entity.onHit();
+					if(js_Boot.__instanceof(entity,ent_Explosion)) {
+						_gthis.level.removeEntity(entity);
+					} else {
+						entity.onHit();
+					}
 				}
 			}
 			var expl = _gthis.level.recycleExplosion();
@@ -1213,7 +1217,11 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 						while(_g3 < entArr1.length) {
 							var entity1 = entArr1[_g3];
 							++_g3;
-							entity1.onHit();
+							if(js_Boot.__instanceof(entity1,ent_Explosion)) {
+								_gthis.level.removeEntity(entity1);
+							} else {
+								entity1.onHit();
+							}
 						}
 					}
 					var expl1 = _gthis.level.recycleExplosion();
@@ -1234,7 +1242,11 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 						while(_g4 < entArr2.length) {
 							var entity2 = entArr2[_g4];
 							++_g4;
-							entity2.onHit();
+							if(js_Boot.__instanceof(entity2,ent_Explosion)) {
+								_gthis.level.removeEntity(entity2);
+							} else {
+								entity2.onHit();
+							}
 						}
 					}
 					var expl2 = _gthis.level.recycleExplosion();
@@ -1255,7 +1267,11 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 						while(_g5 < entArr3.length) {
 							var entity3 = entArr3[_g5];
 							++_g5;
-							entity3.onHit();
+							if(js_Boot.__instanceof(entity3,ent_Explosion)) {
+								_gthis.level.removeEntity(entity3);
+							} else {
+								entity3.onHit();
+							}
 						}
 					}
 					var expl3 = _gthis.level.recycleExplosion();
@@ -1276,7 +1292,11 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 						while(_g6 < entArr4.length) {
 							var entity4 = entArr4[_g6];
 							++_g6;
-							entity4.onHit();
+							if(js_Boot.__instanceof(entity4,ent_Explosion)) {
+								_gthis.level.removeEntity(entity4);
+							} else {
+								entity4.onHit();
+							}
 						}
 					}
 					var expl4 = _gthis.level.recycleExplosion();

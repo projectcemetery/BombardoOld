@@ -91,9 +91,15 @@ class Bomb extends StaticEntity {
         // If wall on the way then returns true
         inline function process (px : Int, py : Int) : Bool {
             if (level.isWall (px, py)) return true;
-            var entArr = level.getEntity (px, py);
-            if (entArr != null) {
-                for (entity in entArr) entity.onHit ();
+            var entArr = level.getEntity (px, py);            
+            if (entArr != null) {                
+                for (entity in entArr) {                    
+                    if (Std.is (entity, Explosion)) {
+                        level.removeEntity (entity);
+                    } else {
+                        entity.onHit ();
+                    }
+                }
             }
             var expl = level.recycleExplosion ();
             level.placeEntity (px, py, expl);
