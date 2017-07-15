@@ -1710,6 +1710,10 @@ ent_Mob.prototype = $extend(ent_MovingEntity.prototype,{
 			while(_g < cols.length) {
 				var c = cols[_g];
 				++_g;
+				if(js_Boot.__instanceof(c.parentEntity,ent_Player)) {
+					play = c.parentEntity;
+					break;
+				}
 				if(c.entities != null) {
 					var _g1 = 0;
 					var _g2 = c.entities;

@@ -169,7 +169,7 @@ class Player extends MovingEntity {
     }
 
     /**
-     *  Playe animation
+     *  Play animation
      */
     function playAnimation () : Void {
         if (isRunning && currentAnimation != runAnimation) {

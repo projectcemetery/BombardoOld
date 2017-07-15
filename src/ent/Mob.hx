@@ -53,10 +53,14 @@ class Mob extends MovingEntity {
      *  On collision
      *  @param cols - 
      */
-    function onCollision (cols : Array<CollisionInfo>) : Void {        
+    function onCollision (cols : Array<CollisionInfo>) : Void {
         if (cols.length > 0) {            
             var play : Entity = null;
             for (c in cols) {
+                if (Std.is(c.parentEntity, Player)) {
+                    play = c.parentEntity;
+                    break;
+                }
                 if (c.entities != null) {
                     for (ent in c.entities) {
                         if (Std.is(ent, Player)) {
