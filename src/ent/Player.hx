@@ -107,17 +107,12 @@ class Player extends MovingEntity {
      *  Filter collision
      */
     function onFilterCollision (c : CollisionInfo) : Bool {
-        if (placedBomb != null) {
-            if (c.entities != null) {                
-                for (e in c.entities) {                    
-                    if (e == placedBomb) {
-                        wasBombCollide = true;
-                        return true;
-                    }
-                }
+        if (c.entities != null) {
+            for (e in c.entities) {
+                if (e == placedBomb) return true;
             }
         }
-
+        //if (wasBombCollide) return true;
         return false;
     }
 
@@ -145,10 +140,19 @@ class Player extends MovingEntity {
             playAnimation ();
             return;            
         }
-
-        wasBombCollide = false;        
-        move (dx, dy);
+        
+        wasBombCollide = false;
+        if (placedBomb != null) {
+            var entArr = level.getEntity (model.x, model.y);
+            if (entArr != null) {
+                for (e in entArr) {
+                    if (e == placedBomb) wasBombCollide = true;
+                }
+            }
+        }
         if (!wasBombCollide) placedBomb = null;
+
+        move (dx, dy);
     }
 
     /**

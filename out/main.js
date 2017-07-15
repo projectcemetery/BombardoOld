@@ -1887,17 +1887,14 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 		this.placedBomb.startTimer();
 	}
 	,onFilterCollision: function(c) {
-		if(this.placedBomb != null) {
-			if(c.entities != null) {
-				var _g = 0;
-				var _g1 = c.entities;
-				while(_g < _g1.length) {
-					var e = _g1[_g];
-					++_g;
-					if(e == this.placedBomb) {
-						this.wasBombCollide = true;
-						return true;
-					}
+		if(c.entities != null) {
+			var _g = 0;
+			var _g1 = c.entities;
+			while(_g < _g1.length) {
+				var e = _g1[_g];
+				++_g;
+				if(e == this.placedBomb) {
+					return true;
 				}
 			}
 		}
@@ -1930,10 +1927,23 @@ ent_Player.prototype = $extend(ent_MovingEntity.prototype,{
 			return;
 		}
 		this.wasBombCollide = false;
-		this.move(dx,dy);
+		if(this.placedBomb != null) {
+			var entArr = this.level.getEntity(this.model.x,this.model.y);
+			if(entArr != null) {
+				var _g = 0;
+				while(_g < entArr.length) {
+					var e = entArr[_g];
+					++_g;
+					if(e == this.placedBomb) {
+						this.wasBombCollide = true;
+					}
+				}
+			}
+		}
 		if(!this.wasBombCollide) {
 			this.placedBomb = null;
 		}
+		this.move(dx,dy);
 	}
 	,onCollision: function(cols) {
 		var _g = 0;
