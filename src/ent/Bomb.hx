@@ -81,7 +81,7 @@ class Bomb extends StaticEntity {
      */
     function boom () : Void {
         level.removeEntity (this);
-        var boomLength = ctx.settings.player.bombBoomLength;
+        var boomLength = ctx.settings.player.boomLength;
 
         var wallLeft = false;
         var wallRight = false;

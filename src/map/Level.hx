@@ -506,8 +506,8 @@ class Level {
      *  Recycle powerup
      *  @return PowerUp
      */
-    public function recyclePowerUp () : PowerUp {
-        return new PowerUp ();
+    public function recyclePowerUp (type : PowerUpType) : PowerUp {
+        return new PowerUp (type);
     }
 
      /**

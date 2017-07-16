@@ -14,20 +14,27 @@ class PlayerSettings extends ChangeNotifier {
     var maxBombCount : Int = 1;
 
     /**
+     *  Length of explosion in map cells
+     */
+    @:notify
+    var boomLength : Int = 2;
+
+    /**
      *  Player score
      */
     @:notify
-    var score : Int = 0;        
+    var score : Int = 0;
+
+    /**
+     *  Player score
+     */
+    @:notify
+    var speed : Float = 0.03;
 
     /**
      *  Time before boom
      */
-    public var beforeBoom : Int = 3;
-    
-    /**
-     *  Length of explosion in map cells
-     */
-    public var bombBoomLength : Int = 2;
+    public var beforeBoom : Int = 3;        
 
     /**
      *  Time of explosion

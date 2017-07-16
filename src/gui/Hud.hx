@@ -170,6 +170,10 @@ class Hud extends Gui {
             setBombCount (e);
         });
 
+        ctx.dispatcher.addHandler (settings.PlayerSettings.BOOMLENGTH, function (e) {
+            //setBoomLength (e);
+        });
+
         ctx.waitEvent.waitUntil (onUpdate);
     }
 }

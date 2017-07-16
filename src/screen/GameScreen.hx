@@ -52,8 +52,10 @@ class GameScreen extends Screen {
      */
     function placePowerup (x : Int, y : Int) {
         var chance = Math.random () * 100;
+        var typeChance = PowerUpType.createByIndex (Math.floor (Math.random () * 3));
+
         if (ctx.settings.player.powerUpChance > 100 - chance) {
-            var poverUp = level.recyclePowerUp ();
+            var poverUp = level.recyclePowerUp (typeChance);
             level.placeEntity (x, y, poverUp);
         }        
     }
@@ -77,7 +79,15 @@ class GameScreen extends Screen {
      *  @param e - 
      */
     public function onPowerUp (e : PowerUp) : Void {
-        ctx.settings.player.maxBombCount += 1;
+        switch (e.type) {
+            case PowerUpType.Bomb:
+                ctx.settings.player.maxBombCount += 1;
+            case PowerUpType.Boom:
+                ctx.settings.player.boomLength += 1;
+            case PowerUpType.Speed:
+                ctx.settings.player.speed += 0.01;
+            default:
+        }        
     }
 
     /**

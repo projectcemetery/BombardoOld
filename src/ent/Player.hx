@@ -10,9 +10,9 @@ import h3d.anim.Animation;
 class Player extends MovingEntity {
 
     /**
-     *  Player speed
+     *  Player speed factor
      */
-    var speed : Float = 0.03;
+    var speedFactor : Float = 0.03;
 
     /**
      *  Placed bomb count
@@ -126,6 +126,7 @@ class Player extends MovingEntity {
         isRunning = false;
         var dx = 0.0;
         var dy = 0.0;
+        var speed = ctx.settings.player.speed;
 
         if (hxd.Key.isDown (hxd.Key.W)) dy = -speed * dt;
         if (hxd.Key.isDown (hxd.Key.S)) dy = speed * dt;

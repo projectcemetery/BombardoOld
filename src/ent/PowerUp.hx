@@ -1,9 +1,35 @@
 package ent;
 
 /**
+ *  Power up type
+ */
+enum PowerUpType {
+
+    /**
+     *  Bomb count
+     */
+    Bomb;
+
+    /**
+     *  Boom lenght
+     */
+    Boom;
+
+    /**
+     *  Player speed
+     */
+    Speed;
+}
+
+/**
  *  Power up
  */
 class PowerUp extends StaticEntity {
+
+    /**
+     *  Power up type
+     */
+    public var type : PowerUpType;
 
     /**
      *  On update
@@ -16,9 +42,21 @@ class PowerUp extends StaticEntity {
     /**
      *  Constructor
      */
-    public function new () {
+    public function new (type : PowerUpType) {
         super ();
-        model = ctx.modelCache.loadModel(hxd.Res.bombpowerup2);
+
+        this.type = type;
+
+        switch (type) {
+            case PowerUpType.Bomb:
+                model = ctx.modelCache.loadModel(hxd.Res.bombpowerup2);
+            case PowerUpType.Boom:
+                model = ctx.modelCache.loadModel(hxd.Res.boompowerup);
+            case PowerUpType.Speed:
+                model = ctx.modelCache.loadModel(hxd.Res.speedpowerup);
+            default:
+        }        
+
         model.scale (0.005);
         model.setPos (0, 0, 0.25);
 
