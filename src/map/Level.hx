@@ -154,9 +154,9 @@ class Level {
     function addWall (id : Int, x : Int, y : Int) : Void {        
         switch (id) {
             case TOWER_MAP_ID: 
-                world.add (towerModel, x + 0.5, y + 0.5, 0.0, 0.009, 0);
+                world.add (towerModel, x + 0.5, y + 0.5, 0.0, 0.0086, 0);
             case WALL_MAP_ID: 
-                world.add (wallModel, x + 0.5, y + 0.5, 0.0, 0.009, 0);
+                world.add (wallModel, x + 0.5, y + 0.5, 0.0, 0.0086, 0);
             default: 
         }
         var pos = getPos (x, y);        
