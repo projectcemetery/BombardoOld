@@ -15,6 +15,11 @@ class Player extends MovingEntity {
     var speedFactor : Float = 0.03;
 
     /**
+     *  Real player speed
+     */
+    var realSpeed : Float;
+
+    /**
      *  Placed bomb count
      */
     var placedCount : Int = 0;
@@ -111,8 +116,7 @@ class Player extends MovingEntity {
             for (e in c.entities) {
                 if (e == placedBomb) return true;
             }
-        }
-        //if (wasBombCollide) return true;
+        }        
         return false;
     }
 
@@ -125,13 +129,12 @@ class Player extends MovingEntity {
         
         isRunning = false;
         var dx = 0.0;
-        var dy = 0.0;
-        var speed = ctx.settings.player.speed;
+        var dy = 0.0;       
 
-        if (hxd.Key.isDown (hxd.Key.W)) dy = -speed * dt;
-        if (hxd.Key.isDown (hxd.Key.S)) dy = speed * dt;
-        if (hxd.Key.isDown (hxd.Key.A)) dx = -speed * dt;
-        if (hxd.Key.isDown (hxd.Key.D)) dx = speed * dt;
+        if (hxd.Key.isDown (hxd.Key.W)) dy = -realSpeed * dt;
+        if (hxd.Key.isDown (hxd.Key.S)) dy = realSpeed * dt;
+        if (hxd.Key.isDown (hxd.Key.A)) dx = -realSpeed * dt;
+        if (hxd.Key.isDown (hxd.Key.D)) dx = realSpeed * dt;
 
         if (hxd.Key.isPressed (hxd.Key.SPACE)) {
             placeBomb ();
@@ -198,6 +201,10 @@ class Player extends MovingEntity {
         model = ctx.modelCache.loadModel(hxd.Res.charWork);        
         model.scale (0.05);                
         reset ();
+
+        ctx.dispatcher.addHandler (settings.PlayerSettings.SPEED, function (e) {
+            realSpeed += (speedFactor / 3);
+        });
     }
 
     /**
@@ -209,6 +216,8 @@ class Player extends MovingEntity {
         placedBomb = null;
         wasBombCollide = false;
         isDisposed = false;
+
+        realSpeed = speedFactor;
         
         setOnFilterCollision (onFilterCollision);
         setOnCollision (onCollision);

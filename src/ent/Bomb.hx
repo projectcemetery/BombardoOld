@@ -81,7 +81,7 @@ class Bomb extends StaticEntity {
      */
     function boom () : Void {
         level.removeEntity (this);
-        var boomLength = ctx.settings.player.boomLength;
+        var boomLength = ctx.settings.player.boomLength + 1;
 
         var wallLeft = false;
         var wallRight = false;
@@ -89,22 +89,24 @@ class Bomb extends StaticEntity {
         var wallBottom = false;
 
         // If wall on the way then returns true
-        inline function process (px : Int, py : Int) : Bool {
+        function process (px : Int, py : Int) : Bool {
             if (level.isWall (px, py)) return true;
-            var entArr = level.getEntity (px, py);            
-            if (entArr != null) {                
+            var entArr = level.getEntity (px, py);
+            var wasDwallHit = false;
+            if (entArr != null) {                                
                 for (entity in entArr) {                    
                     if (Std.is (entity, Explosion)) {
                         level.removeEntity (entity);
                     } else {
-                        entity.onHit ();
+                        if (Std.is (entity, DestructableWall)) wasDwallHit = true;
+                        entity.onHit ();                        
                     }
                 }
             }
             var expl = level.recycleExplosion ();
             level.placeEntity (px, py, expl);
             expl.startTimer ();
-            return false;
+            return wasDwallHit;
         }
 
         var pos = getPos ();

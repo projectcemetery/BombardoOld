@@ -14,21 +14,6 @@ class Hud extends Gui {
     var spacing : Int = 10;
 
     /**
-     *  Image for bomb count
-     */
-    var bombImage : Bitmap;
-
-    /**
-     *  Image for explosion length
-     */
-    var explosionImage : Bitmap;
-
-    /**
-     *  Image for scores
-     */
-    var scoreImage : Bitmap;
-
-    /**
      *  Text for score
      */
     var scoreTxt : h2d.Text;
@@ -36,7 +21,17 @@ class Hud extends Gui {
     /**
      *  Bomb count text
      */
-    var bombCounttxt : h2d.Text;
+    var bombCountTxt : h2d.Text;
+
+    /**
+     *  Boom length text
+     */
+    var boomTxt : h2d.Text;
+
+    /**
+     *  Player speed text
+     */
+    var speedTxt : h2d.Text;
 
     /**
      *  Draw call text
@@ -68,11 +63,27 @@ class Hud extends Gui {
     }
 
     /**
-     *  Set player bomb count
+     *  Set player bomb count text
      *  @param v - 
      */
     function setBombCount (v : Int) : Void {
-        bombCounttxt.text = Std.string (v);
+        bombCountTxt.text = Std.string (v);
+    }
+
+    /**
+     *  Set player bomb boom length
+     *  @param v - 
+     */
+    function setBoomLength (v : Int) : Void {
+        boomTxt.text = Std.string (v);
+    }
+
+    /**
+     *  Set player speed text
+     *  @param v - 
+     */
+    function setSpeed (v : Int) : Void {
+        speedTxt.text = Std.string (v);
     }
 
     /**
@@ -128,28 +139,42 @@ class Hud extends Gui {
 
         var font = hxd.Res.trueTypeFont.build(24);
         
+        // Bomb
         var bombTile = hxd.Res.hbomb.toTile();
-        bombImage = new h2d.Bitmap(bombTile, this);
+        var bombImage = new h2d.Bitmap(bombTile, this);
 
-        bombCounttxt = new h2d.Text(font, bombImage);
-		bombCounttxt.textColor = 0x000000;
-        bombCounttxt.x = bombImage.getSize ().xMax - 24;        
-        bombCounttxt.y = 5;
-        bombCounttxt.text = Std.string (ctx.settings.player.maxBombCount);
+        bombCountTxt = new h2d.Text(font, bombImage);
+		bombCountTxt.textColor = 0x000000;
+        bombCountTxt.x = bombImage.getSize ().xMax - 24;        
+        bombCountTxt.y = 5;
+        bombCountTxt.text = Std.string (ctx.settings.player.maxBombCount);
 
+        // Explosion
         var explosionTile = hxd.Res.hexplosion.toTile();
-        explosionImage = new h2d.Bitmap(explosionTile, this);
+        var explosionImage = new h2d.Bitmap(explosionTile, this);
         explosionImage.x = bombImage.getBounds ().xMax + spacing;
 
-        var etxt = new h2d.Text(font, explosionImage);		
-		etxt.textColor = 0x000000;
-        etxt.x = explosionImage.getSize ().xMax - 24;        
-        etxt.y = 5;
-        etxt.text = "2";
+        boomTxt = new h2d.Text(font, explosionImage);		
+		boomTxt.textColor = 0x000000;
+        boomTxt.x = explosionImage.getSize ().xMax - 24;        
+        boomTxt.y = 5;
+        boomTxt.text = Std.string (ctx.settings.player.boomLength);
 
+        // Speed
+        var speedTile = hxd.Res.hspeed.toTile ();
+        var speedImage = new h2d.Bitmap(speedTile, this);
+        speedImage.x = explosionImage.getBounds ().xMax + spacing;
+
+        speedTxt = new h2d.Text(font, speedImage);
+        speedTxt.textColor = 0x000000;
+        speedTxt.x = speedImage.getSize ().xMax - 20;
+        speedTxt.y = 5;
+        speedTxt.text = Std.string (ctx.settings.player.speed);
+
+        // Score
         var scoreTile = hxd.Res.hscores.toTile();
-        scoreImage = new h2d.Bitmap(scoreTile, this);
-        scoreImage.x = explosionImage.getBounds ().xMax + spacing;
+        var scoreImage = new h2d.Bitmap(scoreTile, this);
+        scoreImage.x = speedImage.getBounds ().xMax + spacing;
 
         scoreTxt = new h2d.Text(font, scoreImage);
 		scoreTxt.textColor = 0x000000;
@@ -171,7 +196,11 @@ class Hud extends Gui {
         });
 
         ctx.dispatcher.addHandler (settings.PlayerSettings.BOOMLENGTH, function (e) {
-            //setBoomLength (e);
+            setBoomLength (e);
+        });
+
+        ctx.dispatcher.addHandler (settings.PlayerSettings.SPEED, function (e) {
+            setSpeed (e);
         });
 
         ctx.waitEvent.waitUntil (onUpdate);
