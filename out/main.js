@@ -56363,8 +56363,10 @@ screen_GameScreen.prototype = $extend(screen_Screen.prototype,{
 	,placePowerup: function(x,y) {
 		var chance = Math.random() * 100;
 		var typeChance = Type.createEnumIndex(ent_PowerUpType,Math.floor(Math.random() * 3),null);
-		var poverUp = this.level.recyclePowerUp(typeChance);
-		this.level.placeEntity(x,y,poverUp);
+		if(this.ctx.settings.player.powerUpChance > 100 - chance) {
+			var poverUp = this.level.recyclePowerUp(typeChance);
+			this.level.placeEntity(x,y,poverUp);
+		}
 	}
 	,onEnter: function() {
 		var _gthis = this;

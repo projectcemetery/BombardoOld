@@ -54,10 +54,10 @@ class GameScreen extends Screen {
         var chance = Math.random () * 100;
         var typeChance = PowerUpType.createByIndex (Math.floor (Math.random () * 3));
 
-        //if (ctx.settings.player.powerUpChance > 100 - chance) {
+        if (ctx.settings.player.powerUpChance > 100 - chance) {
             var poverUp = level.recyclePowerUp (typeChance);
             level.placeEntity (x, y, poverUp);
-        //}        
+        }        
     }
     
     /**
