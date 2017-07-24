@@ -2,6 +2,7 @@ package ent;
 
 import col.Side;
 import col.CollisionInfo;
+import loader.Assets;
 
 /**
  *  Class for mob
@@ -98,10 +99,10 @@ class Mob extends MovingEntity {
     public function new () {
         super ();
         
-        model = ctx.modelCache.loadModel(hxd.Res.Model);
+        model = ctx.assets.getObject (Assets.Model_hmd);
         model.scale (0.06);
 
-        model.playAnimation(ctx.modelCache.loadAnimation(hxd.Res.Model));
+        model.playAnimation(ctx.assets.getAnimation (Assets.Model_hmd));
 
         setOnCollision (onCollision);
         setOnUpdate (onUpdate);

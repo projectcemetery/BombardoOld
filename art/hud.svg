@@ -222,9 +222,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="10.976724"
-     inkscape:cy="624.52036"
+     inkscape:zoom="4"
+     inkscape:cx="-36.885563"
+     inkscape:cy="805.69409"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1259,7 +1259,10 @@
        x="-79.960724"
        y="213.896"
        rx="0"
-       ry="2.8405859" />
+       ry="2.8405859"
+       inkscape:export-filename="/home/grabli66/Workspace/Bombardo/res/hspeed.png"
+       inkscape:export-xdpi="89.707817"
+       inkscape:export-ydpi="89.707817" />
     <rect
        ry="1.4835564"
        rx="0"
@@ -1268,10 +1271,16 @@
        height="17.291105"
        width="63.801804"
        id="rect4319"
-       style="fill:#bd731e;fill-opacity:1;stroke:none;stroke-opacity:1" />
+       style="fill:#bd731e;fill-opacity:1;stroke:none;stroke-opacity:1"
+       inkscape:export-filename="/home/grabli66/Workspace/Bombardo/res/hspeed.png"
+       inkscape:export-xdpi="89.707817"
+       inkscape:export-ydpi="89.707817" />
     <g
        id="g4365"
-       transform="matrix(0.09004279,0,0,0.09004279,-53.290409,140.24922)">
+       transform="matrix(0.09004279,0,0,0.09004279,-53.290409,140.24922)"
+       inkscape:export-filename="/home/grabli66/Workspace/Bombardo/res/hspeed.png"
+       inkscape:export-xdpi="89.707817"
+       inkscape:export-ydpi="89.707817">
       <path
          sodipodi:nodetypes="ccccccccc"
          inkscape:connector-curvature="0"
@@ -1328,7 +1337,7 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:26.85693359px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#296abc;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:26.85693359px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#296abc;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
        x="-39.009583"
        y="240.33481"
        id="text4375"

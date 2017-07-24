@@ -1,5 +1,7 @@
 package ent;
 
+import loader.Assets;
+
 /**
  *  Power up type
  */
@@ -49,11 +51,11 @@ class PowerUp extends StaticEntity {
 
         switch (type) {
             case PowerUpType.Bomb:
-                model = ctx.modelCache.loadModel(hxd.Res.bombpowerup2);
+                model = ctx.assets.getObject(Assets.bombpowerup2_hmd);
             case PowerUpType.Boom:
-                model = ctx.modelCache.loadModel(hxd.Res.boompowerup);
+                model = ctx.assets.getObject(Assets.boompowerup_hmd);
             case PowerUpType.Speed:
-                model = ctx.modelCache.loadModel(hxd.Res.speedpowerup);
+                model = ctx.assets.getObject(Assets.speedpowerup_hmd);
             default:
         }        
 

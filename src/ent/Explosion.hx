@@ -1,5 +1,7 @@
 package ent;
 
+import loader.Assets;
+
 /**
  *  Explosion from bomb
  */
@@ -27,8 +29,8 @@ class Explosion extends StaticEntity {
         parts = new h3d.parts.GpuParticles(model);
         parts.visible = false;
 
-        var g = new h3d.parts.GpuParticles.GpuPartGroup();        
-        g.texture = hxd.Res.explosionpart.toTexture ();
+        var g = new h3d.parts.GpuParticles.GpuPartGroup(parts);        
+        g.texture = ctx.assets.getTexture (Assets.explosionpart_png);
         g.emitMode = ParentBounds;
         g.emitDist = 0;
 

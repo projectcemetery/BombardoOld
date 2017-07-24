@@ -4,6 +4,7 @@ import dispatch.Dispatcher;
 import settings.Settings;
 import screen.Screen;
 import scene.Scene3d;
+import loader.Assets;
 
 /**
  *  All classes needed for game
@@ -19,6 +20,11 @@ class GameContext {
      *  Game screens
      */
     var screens : Map<String, Screen>;
+
+    /**
+     *  Asset manager
+     */
+    public var assets (default, null) : Assets;
 
     /**
      *  Engine
@@ -74,11 +80,12 @@ class GameContext {
      */
     @:allow(app.BomberApp)
     function new (app : hxd.App) {        
+        assets = new Assets ();
         engine = app.engine;
         scene2d = app.s2d;        
         waitEvent = new hxd.WaitEvent ();
         scene3d = new Scene3d (app.s3d, waitEvent);
-        modelCache = new h3d.prim.ModelCache();
+        //modelCache = new h3d.prim.ModelCache();
         
         dispatcher = new Dispatcher ();
         settings = new Settings ();

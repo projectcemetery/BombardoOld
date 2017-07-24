@@ -1,8 +1,9 @@
 package ent;
 
-import h3d.mat.MeshMaterial;
+import h3d.mat.Material;
 import h3d.prim.Cube;
 import h3d.scene.Mesh;
+import loader.Assets;
 
 /**
  *  Destructable wall
@@ -12,7 +13,7 @@ class DestructableWall extends StaticEntity {
     /**
      *  Wall material
      */
-    static var mat : MeshMaterial;
+    static var mat : Material;
 
     /**
      *  Cube primitive
@@ -26,8 +27,8 @@ class DestructableWall extends StaticEntity {
         super ();
 
         if (mat == null) {
-            var tex = hxd.Res.wood.toTexture ();
-            mat = new MeshMaterial (tex);
+            var tex = ctx.assets.getTexture (Assets.wood_png);
+            mat = new Material (tex);
             mat.mainPass.enableLights = true;
             mat.shadows = true;
             cube = new Cube (1, 1, 1);

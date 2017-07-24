@@ -6,6 +6,7 @@ import h2d.Bitmap;
 import h2d.col.Point;
 import h2d.Font;
 import app.GameContext;
+import loader.Assets;
 
 /**
  *  Dialog when player dies
@@ -74,8 +75,8 @@ class GameOverDialog extends Sprite {
         super ();
 
         ctx = GameContext.get ();
-        var font = hxd.Res.trueTypeFont.build(36);
-        var tile = hxd.Res.gameover.toTile ();
+        var font = ctx.assets.getFont (Assets.trueTypeFont_ttf).build(36);
+        var tile = ctx.assets.getTile (Assets.gameover_png);
         dialogImage = new Bitmap (tile, this);    
 
         titleTxt = new h2d.Text(font, dialogImage);
@@ -95,7 +96,7 @@ class GameOverDialog extends Sprite {
         scoreTxt.x = 200;
         scoreTxt.y = tile.height - 125;
 
-        var buttonTile = hxd.Res.retrybutton.toTile ();
+        var buttonTile = ctx.assets.getTile (Assets.retrybutton_png);
         retryButton = new Bitmap (buttonTile, dialogImage);
         retryButton.x = (tile.width / 2) - buttonTile.width / 2;
         retryButton.y = tile.height - buttonTile.height + 10;

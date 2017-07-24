@@ -1,5 +1,7 @@
 package ent;
 
+import loader.Assets;
+
 /**
  *  Bomb entity
  */
@@ -52,8 +54,8 @@ class Bomb extends StaticEntity {
     function createEmitter () : Void {
         parts = new h3d.parts.GpuParticles();
 
-        var g = new h3d.parts.GpuParticles.GpuPartGroup();
-        g.texture = hxd.Res.bombburn.toTexture ();
+        var g = new h3d.parts.GpuParticles.GpuPartGroup(parts);
+        g.texture = ctx.assets.getTexture (Assets.bombburn_png);
         g.emitMode = Cone;
 		g.emitAngle = 0.3;
 		g.emitDist = 0;
@@ -139,7 +141,7 @@ class Bomb extends StaticEntity {
     public function new () {
         super ();
         
-        model = ctx.modelCache.loadModel(hxd.Res.bomb);
+        model = ctx.assets.getObject (Assets.bomb_hmd);
         model.rotate (0.3, 0.0, 0.0);        
         model.scale (0.003);
         time = 0;        

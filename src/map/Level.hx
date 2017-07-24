@@ -1,5 +1,6 @@
 package map;
 
+import loader.Assets;
 import h3d.scene.Mesh;
 import h3d.col.Bounds;
 import col.Side;
@@ -226,7 +227,7 @@ class Level {
      *  Create level
      */
     function createLevel () {
-        var tiled = hxd.Res.map2.toMap ();        
+        var tiled = ctx.assets.getMap (Assets.map2_tmx);
         mapWidth = tiled.width;        
         mapHeight = tiled.height;
 
@@ -536,11 +537,11 @@ class Level {
         ctx.scene3d.removeChild (world);
 
         world = new h3d.scene.World(64, 128);
-        wallModel = world.loadModel(hxd.Res.wall2);
-        towerModel = world.loadModel(hxd.Res.tower1);
-        floorModel = world.loadModel(hxd.Res.back1);
-        backModel = world.loadModel(hxd.Res.back1);
-        treeModel = world.loadModel(hxd.Res.tree1);
+        wallModel = world.loadModel(ctx.assets.getModel (Assets.wall2_hmd));
+        towerModel = world.loadModel(ctx.assets.getModel (Assets.tower1_hmd));
+        floorModel = world.loadModel(ctx.assets.getModel (Assets.back1_hmd));
+        backModel = world.loadModel(ctx.assets.getModel (Assets.back1_hmd));
+        treeModel = world.loadModel(ctx.assets.getModel (Assets.tree1_hmd));
 
         createLevel ();
 

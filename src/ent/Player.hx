@@ -2,6 +2,7 @@ package ent;
 
 import col.CollisionInfo;
 import ent.Bomb;
+import loader.Assets;
 import h3d.anim.Animation;
 
 /**
@@ -195,10 +196,10 @@ class Player extends MovingEntity {
     public function new  () {
         super ();
 
-        runAnimation = ctx.modelCache.loadAnimation(hxd.Res.run_forward_inPlace);
-        idleAnimation = ctx.modelCache.loadAnimation(hxd.Res.happy_idle);
+        runAnimation = ctx.assets.getAnimation(Assets.run_forward_inPlace_hmd);
+        idleAnimation = ctx.assets.getAnimation(Assets.happy_idle_hmd);
 
-        model = ctx.modelCache.loadModel(hxd.Res.charWork);        
+        model = ctx.assets.getObject(Assets.charWork_hmd);
         model.scale (0.05);                
         reset ();
 

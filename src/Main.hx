@@ -1,6 +1,6 @@
 class Main {
     static function main() {
-        hxd.Res.initEmbed();
+        loader.Packer.init ();
         new app.BomberApp ();
     }
 }

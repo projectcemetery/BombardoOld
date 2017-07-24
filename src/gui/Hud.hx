@@ -5,6 +5,7 @@ import h2d.Sprite;
 import h2d.Bitmap;
 import h2d.Font;
 import app.GameContext;
+import loader.Assets;
 
 class Hud extends Gui {
 
@@ -91,7 +92,7 @@ class Hud extends Gui {
      */
     function showDebug () {
         if (isDebug) return;
-        var font = hxd.Res.trueTypeFont.build(16);
+        var font = ctx.assets.getFont (Assets.trueTypeFont_ttf).build(16);
         drawCallTxt = new h2d.Text(font, ctx.scene2d);		
 		drawCallTxt.textColor = 0xFFFFFF;
         drawCallTxt.x = ctx.scene2d.width - 200;
@@ -137,10 +138,10 @@ class Hud extends Gui {
 
         ctx = GameContext.get ();
 
-        var font = hxd.Res.trueTypeFont.build(24);
+        var font = ctx.assets.getFont (Assets.trueTypeFont_ttf).build(24);
         
         // Bomb
-        var bombTile = hxd.Res.hbomb.toTile();
+        var bombTile = ctx.assets.getTile (Assets.hbomb_png);        
         var bombImage = new h2d.Bitmap(bombTile, this);
 
         bombCountTxt = new h2d.Text(font, bombImage);
@@ -150,7 +151,7 @@ class Hud extends Gui {
         bombCountTxt.text = Std.string (ctx.settings.player.maxBombCount);
 
         // Explosion
-        var explosionTile = hxd.Res.hexplosion.toTile();
+        var explosionTile = ctx.assets.getTile (Assets.hexplosion_png);
         var explosionImage = new h2d.Bitmap(explosionTile, this);
         explosionImage.x = bombImage.getBounds ().xMax + spacing;
 
@@ -161,7 +162,7 @@ class Hud extends Gui {
         boomTxt.text = Std.string (ctx.settings.player.boomLength);
 
         // Speed
-        var speedTile = hxd.Res.hspeed.toTile ();
+        var speedTile = ctx.assets.getTile (Assets.hspeed_png);
         var speedImage = new h2d.Bitmap(speedTile, this);
         speedImage.x = explosionImage.getBounds ().xMax + spacing;
 
@@ -172,7 +173,7 @@ class Hud extends Gui {
         speedTxt.text = Std.string (ctx.settings.player.speed);
 
         // Score
-        var scoreTile = hxd.Res.hscores.toTile();
+        var scoreTile = ctx.assets.getTile (Assets.hscores_png);
         var scoreImage = new h2d.Bitmap(scoreTile, this);
         scoreImage.x = speedImage.getBounds ().xMax + spacing;
 
