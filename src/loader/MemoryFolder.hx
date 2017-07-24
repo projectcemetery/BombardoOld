@@ -25,8 +25,7 @@ class MemoryFolder extends MemoryEntry {
      *  @return MemoryEntry
      */
     public function findEntry (path : String) : MemoryEntry {
-        // TODO recursive find
-        trace (path);
+        // TODO recursive find        
         if (childs == null || childs.length < 1) return null;
         for (c in childs) {
             if (c.name == path) return c;

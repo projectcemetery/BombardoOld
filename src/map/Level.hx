@@ -191,7 +191,6 @@ class Level {
         var xlen = 20 + mapWidth;
         var ylen = 20 + mapHeight;
 
-        trace (xlen, ylen);
         for (x in 0...xlen) {
             for (y in 0...ylen) {
                 var mx = -10 + x;

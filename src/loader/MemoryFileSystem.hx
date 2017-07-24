@@ -36,8 +36,7 @@ class MemoryFileSystem implements FileSystem {
 	 *  @param path - 
 	 *  @return FileEntry
 	 */
-	public function get (path : String) : FileEntry {
-		trace (path);
+	public function get (path : String) : FileEntry {		
 		var entry = root.findEntry (path);
 		if (entry == null) return null;
 		return entry.toFileEntry ();

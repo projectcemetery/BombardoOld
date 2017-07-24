@@ -35624,7 +35624,6 @@ loader_Assets.prototype = {
 			_g_head = _g_head.next;
 			root.childs.push(new loader_MemoryFile(val.fileName,val.data,root));
 		}
-		haxe_Log.trace("ASSETS LOAD",{ fileName : "Assets.hx", lineNumber : 41, className : "loader.Assets", methodName : "onLoad"});
 		hxd_res_Loader.currentInstance = new hxd_res_Loader(fs);
 		if(this.onLoaded != null) {
 			this.onLoaded();
@@ -35676,7 +35675,6 @@ loader_Assets.prototype = {
 		return hxd_res_Loader.currentInstance.load(nm).toHmd().makeObject($bind(this,this.getTexture));
 	}
 	,getFont: function(name) {
-		haxe_Log.trace(name,{ fileName : "Assets.hx", lineNumber : 141, className : "loader.Assets", methodName : "getFont"});
 		var nm = name.split("/").pop();
 		return hxd_res_Loader.currentInstance.load(nm).toFont();
 	}
@@ -35723,7 +35721,6 @@ loader_MemoryFileSystem.__interfaces__ = [hxd_fs_FileSystem];
 loader_MemoryFileSystem.prototype = {
 	root: null
 	,get: function(path) {
-		haxe_Log.trace(path,{ fileName : "MemoryFileSystem.hx", lineNumber : 40, className : "loader.MemoryFileSystem", methodName : "get"});
 		var entry = this.root.findEntry(path);
 		if(entry == null) {
 			return null;
@@ -35742,7 +35739,6 @@ loader_MemoryFolder.__super__ = loader_MemoryEntry;
 loader_MemoryFolder.prototype = $extend(loader_MemoryEntry.prototype,{
 	childs: null
 	,findEntry: function(path) {
-		haxe_Log.trace(path,{ fileName : "MemoryFolder.hx", lineNumber : 29, className : "loader.MemoryFolder", methodName : "findEntry"});
 		if(this.childs == null || this.childs.length < 1) {
 			return null;
 		}
@@ -35815,7 +35811,6 @@ map_Level.prototype = {
 	,fillBackground: function() {
 		var xlen = 20 + this.mapWidth;
 		var ylen = 20 + this.mapHeight;
-		haxe_Log.trace(xlen,{ fileName : "Level.hx", lineNumber : 194, className : "map.Level", methodName : "fillBackground", customParams : [ylen]});
 		var _g1 = 0;
 		while(_g1 < xlen) {
 			var x = _g1++;

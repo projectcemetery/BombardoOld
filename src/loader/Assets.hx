@@ -37,8 +37,7 @@ class Assets {
             var fl = new MemoryFile (e.fileName, e.data, root);
             root.childs.push (fl);
         }
-        
-        trace ("ASSETS LOAD");
+                
         // Override current loader
         hxd.res.Loader.currentInstance = new hxd.res.Loader (fs);        
         if (onLoaded != null) {            
@@ -138,7 +137,6 @@ class Assets {
      *  @return hxd.res.Font
      */
     public function getFont (name : String) : Font {
-        trace (name);
         var nm = name.split ("/").pop ();
         return Loader.currentInstance.load (nm).toFont ();
     }
