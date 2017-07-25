@@ -77,7 +77,7 @@ class GameOverDialog extends Sprite {
         ctx = GameContext.get ();
         var font = ctx.assets.getFont (Assets.trueTypeFont_ttf).build(36);
         var tile = ctx.assets.getTile (Assets.gameover_png);
-        dialogImage = new Bitmap (tile, this);    
+        dialogImage = new Bitmap (tile, this);            
 
         titleTxt = new h2d.Text(font, dialogImage);
         titleTxt.textColor = 0xFFFFFF;
@@ -109,7 +109,6 @@ class GameOverDialog extends Sprite {
 
         ctx.scene2d.addChild (this);
         this.visible = false;
-        this.x = (ctx.scene2d.width / 2) - tile.width / 2;
 
         cursorPoint = new Point ();
     }
@@ -119,11 +118,14 @@ class GameOverDialog extends Sprite {
      */
     public function show () : Void {
         if (visible) return;
+
         visible = true;
+
+        this.x = (ctx.scene2d.width / 2) - dialogImage.getSize ().width / 2;
         scoreTxt.text = Std.string (ctx.settings.player.score);
-        ctx.waitEvent.waitUntil (onUpdate);
-        var height = dialogImage.getBounds ().height;        
+        var height = dialogImage.getBounds ().height;
         dialogImage.y = -height;
+        ctx.waitEvent.waitUntil (onUpdate);
     }
 
     /**

@@ -3851,8 +3851,6 @@ var gui_GameOverDialog = function() {
 	buttonTxt.set_text("Retry");
 	this.ctx.scene2d.addChild(this);
 	this.set_visible(false);
-	this.posChanged = true;
-	this.x = this.ctx.scene2d.width / 2 - tile.width / 2;
 	this.cursorPoint = new h2d_col_Point();
 };
 $hxClasses["gui.GameOverDialog"] = gui_GameOverDialog;
@@ -3893,12 +3891,16 @@ gui_GameOverDialog.prototype = $extend(h2d_Sprite.prototype,{
 			return;
 		}
 		this.set_visible(true);
+		var v = this.ctx.scene2d.width / 2;
+		var _this = this.dialogImage.getSize();
+		this.posChanged = true;
+		this.x = v - (_this.xMax - _this.xMin) / 2;
 		this.scoreTxt.set_text(Std.string(this.ctx.settings.player._score));
+		var _this1 = this.dialogImage.getBounds();
+		var _this2 = this.dialogImage;
+		_this2.posChanged = true;
+		_this2.y = -(_this1.yMax - _this1.yMin);
 		this.ctx.waitEvent.waitUntil($bind(this,this.onUpdate));
-		var _this = this.dialogImage.getBounds();
-		var _this1 = this.dialogImage;
-		_this1.posChanged = true;
-		_this1.y = -(_this.yMax - _this.yMin);
 	}
 	,hide: function() {
 		this.set_visible(false);
