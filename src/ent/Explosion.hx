@@ -29,6 +29,12 @@ class Explosion extends StaticEntity {
         parts = new h3d.parts.GpuParticles(model);
         parts.visible = false;
 
+        var material = new h3d.mat.Material();
+		material.mainPass.culling = None;
+		material.mainPass.depthWrite = false;
+		material.blendMode = Add;
+        material.color = new h3d.Vector (0.5, 0.1, 0.5, 1);
+
         var g = new h3d.parts.GpuParticles.GpuPartGroup(parts);        
         g.texture = ctx.assets.getTexture (Assets.explosionpart_png);
         g.emitMode = ParentBounds;
@@ -46,7 +52,7 @@ class Explosion extends StaticEntity {
 		g.lifeRand = 1;
 		g.nparts = 1000;
         group = g;
-        parts.addGroup (g);
+        parts.addGroup (g, material);
     }
 
     /**

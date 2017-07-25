@@ -10,12 +10,7 @@ class Bomb extends StaticEntity {
     /**
      *  Particles
      */
-    var parts : h3d.parts.GpuParticles;
-
-	/**
-	 *  Particle group
-	 */
-	var group : h3d.parts.GpuParticles.GpuPartGroup;
+    var parts : h3d.parts.GpuParticles;	
     
     /**
      *  Bomb is armed
@@ -54,8 +49,14 @@ class Bomb extends StaticEntity {
     function createEmitter () : Void {
         parts = new h3d.parts.GpuParticles();
 
+        var material = new h3d.mat.Material();
+		material.mainPass.culling = None;
+		material.mainPass.depthWrite = false;
+		material.blendMode = Add;
+
         var g = new h3d.parts.GpuParticles.GpuPartGroup(parts);
-        g.texture = ctx.assets.getTexture (Assets.bombburn_png);
+        g.texture = ctx.assets.getTexture (Assets.bombburn_png);        
+
         g.emitMode = Cone;
 		g.emitAngle = 0.3;
 		g.emitDist = 0;
@@ -74,8 +75,7 @@ class Bomb extends StaticEntity {
 		g.life = 0.3;
 		g.lifeRand = 0.5;
 		g.nparts = 100;
-        group = g;
-        parts.addGroup (g);
+        parts.addGroup (g, material);
     }
 
     /**

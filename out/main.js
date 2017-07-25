@@ -877,7 +877,6 @@ ent_Bomb.__name__ = ["ent","Bomb"];
 ent_Bomb.__super__ = ent_StaticEntity;
 ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 	parts: null
-	,group: null
 	,isArmed: null
 	,time: null
 	,onBoom: null
@@ -911,6 +910,10 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 	}
 	,createEmitter: function() {
 		this.parts = new h3d_parts_GpuParticles();
+		var material = new h3d_mat_Material();
+		material.passes.set_culling(h3d_mat_Face.None);
+		material.passes.set_depthWrite(false);
+		material.set_blendMode(h2d_BlendMode.Add);
 		var g = new h3d_parts_GpuPartGroup(this.parts);
 		g.texture = this.ctx.assets.getTexture("bombburn.png");
 		g.needRebuild = true;
@@ -941,8 +944,7 @@ ent_Bomb.prototype = $extend(ent_StaticEntity.prototype,{
 			g.needRebuild = true;
 		}
 		g.nparts = 100;
-		this.group = g;
-		this.parts.addGroup(g);
+		this.parts.addGroup(g,material);
 	}
 	,boom: function() {
 		var _gthis = this;
@@ -1088,6 +1090,11 @@ ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
 	,createEmitter: function() {
 		this.parts = new h3d_parts_GpuParticles(this.model);
 		this.parts.flags &= -3;
+		var material = new h3d_mat_Material();
+		material.passes.set_culling(h3d_mat_Face.None);
+		material.passes.set_depthWrite(false);
+		material.set_blendMode(h2d_BlendMode.Add);
+		material.mshader.color__ = new h3d_Vector(0.5,0.1,0.5,1);
 		var g = new h3d_parts_GpuPartGroup(this.parts);
 		g.texture = this.ctx.assets.getTexture("explosionpart.png");
 		g.needRebuild = true;
@@ -1113,7 +1120,7 @@ ent_Explosion.prototype = $extend(ent_StaticEntity.prototype,{
 		}
 		g.nparts = 1000;
 		this.group = g;
-		this.parts.addGroup(g);
+		this.parts.addGroup(g,material);
 	}
 	,startTimer: function() {
 		var _gthis = this;
