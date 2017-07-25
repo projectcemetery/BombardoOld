@@ -9,117 +9,41 @@ function loadGame () {
     var centerx = width / 2;
     var centery = height / 2;
 
-    var angle = 0.0;
+    var angle = 0.0;    
     var pos = 0;
     var kpos = 1;
 
+    
     function drawAnimation () {
         if (!isLoading) return;
         ctx.fillStyle = "#000000";
         ctx.fillRect(0,0,width,height);
 
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate (angle * 3.14 / 180);
-        ctx.fillStyle = "#00BB99";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
+        for (var i = 0; i < 50; i++) {
+            ctx.save();
+            ctx.translate (centerx, centery);
+            ctx.rotate ((angle - i*4) * 3.14 / 180);
+            ctx.beginPath();
+            ctx.arc(0, -45, 6 - i / 10,0,2*Math.PI);            
+            var s = "hsla(" + 120 + i * pos / 10  + ", " + pos + "%, 50%, 0.9)";
+            ctx.fillStyle = s;
+            ctx.fill();
+            ctx.restore ();
 
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle - 20) * 3.14 / 180);
-        ctx.fillStyle = "#00BB99";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
+            pos += 0.01 * kpos;
+            if (pos > 100) kpos = -1;
+            if (pos < 1) kpos = 1;
+        }
 
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 60) * 3.14 / 180);
-        ctx.fillStyle = "#00BBAA";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 40) * 3.14 / 180);
-        ctx.fillStyle = "#00BBAA";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
-
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 120) * 3.14 / 180);
-        ctx.fillStyle = "#00BBBB";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 100) * 3.14 / 180);
-        ctx.fillStyle = "#00BBBB";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
-
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 180) * 3.14 / 180);
-        ctx.fillStyle = "#00BBCC";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 160) * 3.14 / 180);
-        ctx.fillStyle = "#00BBCC";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
-
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 240) * 3.14 / 180);
-        ctx.fillStyle = "#00BBEE";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 220) * 3.14 / 180);
-        ctx.fillStyle = "#00BBEE";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
-
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 300) * 3.14 / 180);
-        ctx.fillStyle = "#0088FF";
-        ctx.fillRect(pos / 5, 30, 30, 30);        
-        ctx.restore ();
-
-        ctx.save();
-        ctx.translate (centerx, centery);
-        ctx.rotate ((angle + 280) * 3.14 / 180);
-        ctx.fillStyle = "#0088FF";
-        ctx.fillRect(pos, 80, 40, 40);        
-        ctx.restore ();
-        
-        pos += kpos;
-        if (pos > 100) kpos = -1;
-        if (pos < 0) kpos = 1;
-
-        angle += 1;
-        if (angle > 360) angle = 0;
+        angle += 2;
+        if (angle > 360) angle = 0;        
 
         window.requestAnimationFrame(drawAnimation);
     }
 
     function loadAll () {
         var req = new XMLHttpRequest();
-        req.open("GET", "/pack.zip", true);
+        req.open("GET", "/pack.zip");
         req.responseType = "arraybuffer";
 
         req.onload = function (e) {
@@ -129,19 +53,21 @@ function loadGame () {
                 data : resp
             }
 
-            var script = document.createElement('script');
-            script.src = "main.js";
-            script.async = true;
-            script.onload = function () { 
-                window.setTimeout (function() {
-                    isLoading = false;
-                    loaderCanvas.remove ();
-                    var game = document.getElementById("webgl");    
-                    game.style.display = "block";
-                }, 4000);                
-            };        
+            var req2 = new XMLHttpRequest();
+            req2.open("GET", "/main.js");
+            req2.onload = function (e2) {
+                window.setTimeout (function() {                
+                    eval (req2.responseText);
+                    setTimeout (function() {
+                        isLoading = false;
+                        loaderCanvas.remove ();
+                        var game = document.getElementById("webgl");    
+                        game.style.display = "block";
+                    }, 2000);                    
+                }, 4000);
+            };
 
-            document.head.appendChild(script);
+            req2.send ();
         };
 
         req.send ();
